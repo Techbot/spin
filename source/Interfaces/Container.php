@@ -1,6 +1,6 @@
 <?php
 
-namespace Spin\Contracts;
+namespace Spin\Interfaces;
 
 use ArrayAccess;
 

@@ -3,29 +3,29 @@
 namespace Spin\Traits;
 
 use Spin\Container;
-use Spin\Contracts;
+use Spin\Interfaces;
 
 trait ContainerDependency
 {
     /**
-     * @var Contracts\Container
+     * @var Interfaces\Container
      */
     protected $container;
 
     /**
-     * @param Contracts\Container|null $container
+     * @param Interfaces\Container|null $container
      */
-    public function __construct(Contracts\Container $container = null)
+    public function __construct(Interfaces\Container $container = null)
     {
         $this->setContainerDependency($container);
     }
 
     /**
-     * @param Contracts\Container|null $container
+     * @param Interfaces\Container|null $container
      *
      * @return $this
      */
-    protected function setContainerDependency(Contracts\Container $container = null)
+    protected function setContainerDependency(Interfaces\Container $container = null)
     {
         if ($container === null) {
             $container = Container::shared();

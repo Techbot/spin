@@ -38,11 +38,11 @@ class Application
 
         $this->bindProviders();
 
-        $router = $this->container[Contracts\Router::class];
+        $router = $this->container["router"];
 
-        $loop   = $this->container[React\EventLoop\LoopInterface::class];
-        $socket = $this->container[React\Socket\ServerInterface::class];
-        $server = $this->container[React\Http\ServerInterface::class];
+        $loop   = $this->container["react/event-loop/loop"];
+        $socket = $this->container["react/socket/server"];
+        $server = $this->container["react/http/server"];
 
         $server->on("request", function ($request, $response) use ($router) {
             try {
@@ -55,9 +55,8 @@ class Application
                     $handler    = $info["handler"];
                     $parameters = $info["parameters"];
 
-                    if (class_exists($info["handler"][0])) {
-                        $handler[0] = new $handler[0]();
-                    }
+                    $parts   = explode("@", $handler);
+                    $handler = [new $parts[0], $parts[1]];
 
                     $response->writeHead(200, ["content-type" => "text/html"]);
                     $response->end(call_user_func($handler, $request, $response, $parameters));
@@ -93,7 +92,7 @@ class Application
      */
     protected function bindDefaultRouter()
     {
-        $this->container->bindShared(Contracts\Router::class, function () {
+        $this->container->bindShared("router", function () {
             return new Router();
         });
 
@@ -105,8 +104,8 @@ class Application
      */
     protected function bindDefaultRouteCollection()
     {
-        $this->container->bindShared(Contracts\Router\RouteCollection::class, function () {
-            return new Router\RouteCollection();
+        $this->container->bindShared("routes", function () {
+            return new Routes();
         });
 
         return $this;
@@ -117,7 +116,7 @@ class Application
      */
     protected function bindDefaultEventLoop()
     {
-        $this->container->bindShared(React\EventLoop\LoopInterface::class, function () {
+        $this->container->bindShared("react/event-loop/loop", function () {
             return React\EventLoop\Factory::create();
         });
 
@@ -129,9 +128,9 @@ class Application
      */
     protected function bindDefaultSocket()
     {
-        $this->container->bindShared(React\Socket\ServerInterface::class, function () {
+        $this->container->bindShared("react/socket/server", function () {
             return new React\Socket\Server(
-                $this->container[React\EventLoop\LoopInterface::class]
+                $this->container->resolve("react/event-loop/loop")
             );
         });
 
@@ -143,9 +142,9 @@ class Application
      */
     protected function bindDefaultServer()
     {
-        $this->container->bindShared(React\Http\ServerInterface::class, function () {
+        $this->container->bindShared("react/http/server", function () {
             return new React\Http\Server(
-                $this->container[React\Socket\ServerInterface::class]
+                $this->container->resolve("react/socket/server")
             );
         });
 

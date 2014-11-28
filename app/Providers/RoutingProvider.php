@@ -10,12 +10,15 @@ class RoutingProvider
 {
     use Traits\ContainerDependency;
 
+    /**
+     * @return void
+     */
     public function bind()
     {
-        $this->container->extend(Contracts\Router\RouteCollection::class, function (Contracts\Router\RouteCollection $collection) {
-            $collection->add("GET", "/", [IndexController::class, "index"]);
+        $routes = $this->container->resolve("routes");
 
-            return $collection;
-        });
+        $index = IndexController::class;
+
+        $routes->get("/", "{$index}@index");
     }
 }

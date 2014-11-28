@@ -6,7 +6,7 @@ use FastRoute;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 
-class Router implements Contracts\Router
+class Router implements Interfaces\Router
 {
     use Traits\ContainerDependency;
 
@@ -18,29 +18,29 @@ class Router implements Contracts\Router
      */
     public function dispatch($method, $uri)
     {
-        $collection = $this->getRouteCollection();
-        $dispatcher = $this->getDispatcher($collection);
+        $routes     = $this->getRoutes();
+        $dispatcher = $this->getDispatcher($routes);
 
         return $this->handleDispatch($dispatcher, $method, $uri);
     }
 
     /**
-     * @return Contracts\Router\RouteCollection
+     * @return Interfaces\Routes
      */
-    protected function getRouteCollection()
+    protected function getRoutes()
     {
-        return $this->container[Contracts\Router\RouteCollection::class];
+        return $this->container->resolve("routes");
     }
 
     /**
-     * @param Contracts\Router\RouteCollection $collection
+     * @param Interfaces\Routes $routes
      *
      * @return Dispatcher
      */
-    protected function getDispatcher(Contracts\Router\RouteCollection $collection)
+    protected function getDispatcher(Interfaces\Routes $routes)
     {
-        return FastRoute\simpleDispatcher(function (RouteCollector $collector) use ($collection) {
-            $collection->applyTo($collector);
+        return FastRoute\simpleDispatcher(function (RouteCollector $collector) use ($routes) {
+            $routes->applyTo($collector);
         });
     }
 

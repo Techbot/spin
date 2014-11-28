@@ -4,7 +4,7 @@ namespace Spin;
 
 use Pimple;
 
-class Container implements Contracts\Container
+class Container implements Interfaces\Container
 {
     /**
      * @var array
