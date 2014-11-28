@@ -2,7 +2,8 @@
 
 namespace App\Providers;
 
-use Spin\Contracts;
+use Dotenv;
+use Spin\Interfaces;
 use Spin\Traits;
 
 class EventProvider
@@ -16,15 +17,28 @@ class EventProvider
     {
         $events = $this->container->resolve("events");
 
-        $this->profile($events);
+        $this->bindEnvironment($events);
+        $this->bindProfiling($events);
     }
 
     /**
-     * @param $events
+     * @param Interfaces\Events $events
      *
      * @return void
      */
-    protected function profile($events)
+    protected function bindEnvironment(Interfaces\Events $events)
+    {
+        $events->listen("app/before", function ($event) {
+            Dotenv::load($_SERVER["PWD"]);
+        });
+    }
+
+    /**
+     * @param Interfaces\Events $events
+     *
+     * @return void
+     */
+    protected function bindProfiling(Interfaces\Events $events)
     {
         $time = null;
 

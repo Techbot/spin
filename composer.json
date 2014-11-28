@@ -2,7 +2,7 @@
     "require": {
         "react/react": "0.*",
         "nikic/fast-route": "0.*",
-        "filp/whoops": "1.*",
+        "symfony/debug": "2.*",
         "pimple/pimple": "3.*",
         "vlucas/phpdotenv": "1.*",
         "league/event": "1.*"
