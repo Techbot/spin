@@ -19,6 +19,6 @@ class RoutingProvider
 
         $index = IndexController::class;
 
-        $routes->get("/", "{$index}@index");
+        $routes->add("GET", "/", "{$index}@index");
     }
 }
