@@ -1,12 +1,12 @@
 <?php
 
-namespace app\Providers;
+namespace App\Providers;
 
 use App\Controllers\IndexController;
 use Spin\Contracts;
 use Spin\Traits;
 
-class RoutingProvider
+class RouteProvider
 {
     use Traits\ContainerDependency;
 

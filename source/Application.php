@@ -2,6 +2,8 @@
 
 namespace Spin;
 
+use League\Event\PriorityEmitter;
+use LogicException;
 use React;
 
 class Application
@@ -9,20 +11,19 @@ class Application
     use Traits\ContainerDependency;
 
     /**
-     * @var array
+     * @var Interfaces\Blueprint
      */
-    protected $providers = [];
+    protected $blueprint;
 
     /**
-     * @param array $providers
-     *
-     * @return $this
+     * @param Interfaces\Blueprint $blueprint
+     * @param Interfaces\Container $container
      */
-    public function setProviders(array $providers)
+    public function __construct(Interfaces\Blueprint $blueprint, Interfaces\Container $container = null)
     {
-        $this->providers = $providers;
+        $this->setContainerDependency($container);
 
-        return $this;
+        $this->blueprint = $blueprint;
     }
 
     /**
@@ -30,21 +31,21 @@ class Application
      */
     public function run()
     {
-        $this->bindDefaultRouter();
-        $this->bindDefaultRouteCollection();
-        $this->bindDefaultEventLoop();
-        $this->bindDefaultSocket();
-        $this->bindDefaultServer();
-
+        $this->bindDependencies();
         $this->bindProviders();
 
-        $router = $this->container["router"];
+        $events = $this->container->resolve("events");
+        $events->emit("app/before");
 
-        $loop   = $this->container["react/event-loop/loop"];
-        $socket = $this->container["react/socket/server"];
-        $server = $this->container["react/http/server"];
+        $loop   = $this->container->resolve("loop");
+        $socket = $this->container->resolve("socket/server");
+        $server = $this->container->resolve("http/server");
 
-        $server->on("request", function ($request, $response) use ($router) {
+        $router = $this->container->resolve("router");
+
+        $server->on("request", function ($request, $response) use ($events, $router) {
+            $events->emit("request/before", $request, $response);
+
             try {
                 $info = $router->dispatch(
                     $request->getMethod(),
@@ -52,48 +53,51 @@ class Application
                 );
 
                 if ($info["status"] === 200) {
-                    $handler    = $info["handler"];
-                    $parameters = $info["parameters"];
-
-                    $parts   = explode("@", $handler);
-                    $handler = [new $parts[0], $parts[1]];
-
-                    $response->writeHead(200, ["content-type" => "text/html"]);
-                    $response->end(call_user_func($handler, $request, $response, $parameters));
+                    $this->handleAction($info, $request, $response);
                 }
 
                 if ($info["status"] === 404) {
-                    // TODO
-
-                    $response->writeHead(404, ["content-type" => "text/plain"]);
-                    $response->end("Not found.");
+                    $this->handleNotFoundError($response);
                 }
 
                 if ($info["status"] === 405) {
-                    // TODO
-
-                    $response->writeHead(405, ["content-type" => "text/plain"]);
-                    $response->end("Method not allowed.");
+                    $this->handleMethodError($response);
                 }
             } catch (Exception $exception) {
-                // TODO
-
-                $response->writeHead(500, ["content-type" => "text/plain"]);
-                $response->end("Server error.");
+                $this->handleServerError($response);
             }
+
+            $events->emit("request/after", $request, $response);
         });
 
         $socket->listen(4000);
         $loop->run();
+
+        $events->emit("app/after");
     }
 
     /**
      * @return $this
      */
-    protected function bindDefaultRouter()
+    protected function bindDependencies()
+    {
+        $this->bindEvents();
+        $this->bindRouter();
+        $this->bindRoutes();
+        $this->bindEventLoop();
+        $this->bindSocket();
+        $this->bindServer();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function bindRouter()
     {
         $this->container->bindShared("router", function () {
-            return new Router();
+            return new Router;
         });
 
         return $this;
@@ -102,10 +106,10 @@ class Application
     /**
      * @return $this
      */
-    protected function bindDefaultRouteCollection()
+    protected function bindRoutes()
     {
         $this->container->bindShared("routes", function () {
-            return new Routes();
+            return new Routes;
         });
 
         return $this;
@@ -114,9 +118,21 @@ class Application
     /**
      * @return $this
      */
-    protected function bindDefaultEventLoop()
+    protected function bindEvents()
     {
-        $this->container->bindShared("react/event-loop/loop", function () {
+        $this->container->bindShared("events", function () {
+            return new Events(new PriorityEmitter);
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function bindEventLoop()
+    {
+        $this->container->bindShared("loop", function () {
             return React\EventLoop\Factory::create();
         });
 
@@ -126,11 +142,11 @@ class Application
     /**
      * @return $this
      */
-    protected function bindDefaultSocket()
+    protected function bindSocket()
     {
-        $this->container->bindShared("react/socket/server", function () {
+        $this->container->bindShared("socket/server", function () {
             return new React\Socket\Server(
-                $this->container->resolve("react/event-loop/loop")
+                $this->container->resolve("loop")
             );
         });
 
@@ -140,11 +156,11 @@ class Application
     /**
      * @return $this
      */
-    protected function bindDefaultServer()
+    protected function bindServer()
     {
-        $this->container->bindShared("react/http/server", function () {
+        $this->container->bindShared("http/server", function () {
             return new React\Http\Server(
-                $this->container->resolve("react/socket/server")
+                $this->container->resolve("socket/server")
             );
         });
 
@@ -156,8 +172,10 @@ class Application
      */
     protected function bindProviders()
     {
-        foreach ($this->providers as $provider) {
-            $instances[$provider] = new $provider();
+        $providers = $this->blueprint->getProviders();
+
+        foreach ($providers as $provider) {
+            $instances[$provider] = new $provider;
         }
 
         foreach ($instances as $instance) {
@@ -171,6 +189,76 @@ class Application
                 $instance->run();
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @param array               $info
+     * @param React\Http\Request  $request
+     * @param React\Http\Response $response
+     *
+     * @return $this
+     */
+    protected function handleAction(array $info, $request, $response)
+    {
+        $handler    = $info["handler"];
+        $parameters = $info["parameters"];
+
+        $parts   = explode("@", $handler);
+        $handler = [new $parts[0], $parts[1]];
+
+        if (!is_callable($handler)) {
+            throw new LogicException("handler invalid");
+        }
+
+        $response->writeHead(200, ["content-type" => "text/html"]);
+        $response->end(call_user_func($handler, $request, $response, $parameters));
+
+        return $this;
+    }
+
+    /**
+     * @param React\Http\Response $response
+     *
+     * @return $this
+     */
+    protected function handleNotFoundError($response)
+    {
+        // TODO
+
+        $response->writeHead(404, ["content-type" => "text/plain"]);
+        $response->end("Not found.");
+
+        return $this;
+    }
+
+    /**
+     * @param React\Http\Response $response
+     *
+     * @return $this
+     */
+    protected function handleMethodError($response)
+    {
+        // TODO
+
+        $response->writeHead(405, ["content-type" => "text/plain"]);
+        $response->end("Method not allowed.");
+
+        return $this;
+    }
+
+    /**
+     * @param React\Http\Response $response
+     *
+     * @return $this
+     */
+    protected function handleServerError($response)
+    {
+        // TODO
+
+        $response->writeHead(500, ["content-type" => "text/plain"]);
+        $response->end("Server error.");
 
         return $this;
     }
