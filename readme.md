@@ -26,6 +26,7 @@ $ vendor/bin/phpunit
 ## Running
 
 ```sh
+$ git@github.com:assertchris/spin.git
 $ cd spin
 $ php server.php
 ```
