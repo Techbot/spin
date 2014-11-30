@@ -26,7 +26,7 @@ class Container implements Interfaces\Container
      */
     public function __construct()
     {
-        $this->provider = new Pimple\Container;
+        $this->provider = new Pimple\Container();
     }
 
     /**

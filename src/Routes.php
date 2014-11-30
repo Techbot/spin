@@ -3,9 +3,6 @@
 namespace Spin;
 
 use FastRoute\RouteCollector;
-use Spin\Interfaces;
-use Spin\Traits;
-
 class Routes implements Interfaces\Routes
 {
     /**

@@ -3,9 +3,6 @@
 namespace Spin;
 
 use League\Event\PriorityEmitter;
-use Spin\Interfaces;
-use Spin\Traits;
-
 class Events implements Interfaces\Events
 {
     /**

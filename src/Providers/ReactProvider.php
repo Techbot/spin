@@ -4,7 +4,6 @@ namespace Spin\Providers;
 
 use React;
 use Spin\Provider;
-use Spin\Traits;
 
 class ReactProvider extends Provider
 {

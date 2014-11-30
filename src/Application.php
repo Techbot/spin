@@ -118,7 +118,7 @@ class Application extends Container implements Interfaces\Application
         $providers = array_merge($providers, $this->blueprint->getProviders());
 
         foreach ($providers as $provider) {
-            $instance = new $provider;
+            $instance = new $provider();
 
             if ($instance instanceof Interfaces\ApplicationAware) {
                 $instance->setApplication($this);
@@ -141,7 +141,7 @@ class Application extends Container implements Interfaces\Application
         $parameters = $info["parameters"];
 
         $parts   = explode("@", $handler);
-        $handler = [new $parts[0], $parts[1]];
+        $handler = [new $parts[0](), $parts[1]];
 
         if (!is_callable($handler)) {
             throw new LogicException("handler invalid");
