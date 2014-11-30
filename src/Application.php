@@ -134,11 +134,11 @@ class Application extends Container implements Interfaces\Application
         );
 
         $http->on("request", function ($request, $response) use ($emitter) {
-            $emitter->emit("http.request.before");
+            $emitter->emit("http.request.before", $request, $response);
 
             $this->handleRequest($this->resolve("route.dispatcher"), $request, $response);
 
-            $emitter->emit("http.request.after");
+            $emitter->emit("http.request.after", $request, $response);
         });
 
         $emitter->emit("http.bind.after");
