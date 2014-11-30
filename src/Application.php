@@ -194,6 +194,8 @@ class Application extends Container implements Interfaces\Application
 
     protected function printHeader()
     {
+        // http://patorjk.com/software/taag
+
         print "         _
  ___ ___|_|___
 |_ -| . | |   |
