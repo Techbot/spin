@@ -15,8 +15,6 @@ class IndexController
      */
     public function index()
     {
-        throw new Exception;
-
-        return "this is a quick page";
+        return "Hello.";
     }
 }

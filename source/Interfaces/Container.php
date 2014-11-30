@@ -2,9 +2,7 @@
 
 namespace Spin\Interfaces;
 
-use ArrayAccess;
-
-interface Container extends ArrayAccess
+interface Container
 {
     /**
      * @param string   $key

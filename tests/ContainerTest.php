@@ -99,27 +99,6 @@ class ContainerTest extends TestCase
      *
      * @return void
      */
-    public function itHasArrayAccess()
-    {
-        $container = new Container();
-
-        $container["foo"] = function() {
-            return new StdClass();
-        };
-
-        $this->assertArrayHasKey("foo", $container);
-        $this->assertNotNull($container["foo"]);
-
-        unset($container["foo"]);
-
-        $this->assertNull($container["foo"]);
-    }
-
-    /**
-     * @test
-     *
-     * @return void
-     */
     public function itSharesItself()
     {
         $first = Container::shared();

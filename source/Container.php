@@ -107,43 +107,6 @@ class Container implements Interfaces\Container
     }
 
     /**
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function offsetExists($key)
-    {
-        return isset($this->provider[$key]);
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function offsetGet($key)
-    {
-        return $this->resolve($key);
-    }
-
-    /**
-     * @param mixed    $key
-     * @param callable $value
-     */
-    public function offsetSet($key, $value)
-    {
-        $this->bind($key, $value);
-    }
-
-    /**
-     * @param string $key
-     */
-    public function offsetUnset($key)
-    {
-        $this->unbind($key);
-    }
-
-    /**
      * @return static
      */
     public static function shared()

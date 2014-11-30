@@ -16,8 +16,6 @@ class RouteProvider
     {
         $routes = $this->container->resolve("routes");
 
-        $index = IndexController::class;
-
-        $routes->add("GET", "/", "{$index}@index");
+        $routes->add("GET", "/", IndexController::class."@index");
     }
 }

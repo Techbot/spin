@@ -28,7 +28,7 @@ class EventProvider
      */
     protected function bindEnvironment(Interfaces\Events $events)
     {
-        $events->listen("app/before", function ($event) {
+        $events->listen("app.before", function ($event) {
             Dotenv::load($_SERVER["PWD"]);
         });
     }
@@ -42,11 +42,11 @@ class EventProvider
     {
         $time = null;
 
-        $events->listen("request/before", function ($event, $request, $response) use (&$time) {
+        $events->listen("request.before", function ($event, $request, $response) use (&$time) {
             $time = microtime(true);
         });
 
-        $events->listen("request/after", function ($event, $request, $response) use (&$time) {
+        $events->listen("request.after", function ($event, $request, $response) use (&$time) {
             $path   = $request->getPath();
             $time   = number_format(microtime(true) - $time, 5);
             $memory = memory_get_usage();
