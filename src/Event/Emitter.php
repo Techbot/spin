@@ -1,9 +1,11 @@
 <?php
 
-namespace Spin;
+namespace Spin\Event;
 
 use League\Event\PriorityEmitter;
-class Events implements Interfaces\Events
+use Spin\Interfaces;
+
+class Emitter implements Interfaces\Event\Emitter
 {
     /**
      * @var PriorityEmitter

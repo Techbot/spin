@@ -1,8 +1,8 @@
 <?php
 
-namespace Spin\Interfaces;
+namespace Spin\Interfaces\Route;
 
-interface Router
+interface Dispatcher
 {
     /**
      * @param string $method

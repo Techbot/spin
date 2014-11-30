@@ -1,12 +1,14 @@
 <?php
 
-namespace Spin;
+namespace Spin\Route;
 
 use FastRoute;
-use FastRoute\Dispatcher;
+use FastRoute\Dispatcher as FastRouteDispatcher;
 use FastRoute\RouteCollector;
+use Spin\Interfaces;
+use Spin\Traits;
 
-class Router implements Interfaces\Router, Interfaces\ApplicationAware
+class Dispatcher implements Interfaces\Route\Dispatcher, Interfaces\ApplicationAware
 {
     use Traits\ApplicationAware;
 
@@ -18,26 +20,18 @@ class Router implements Interfaces\Router, Interfaces\ApplicationAware
      */
     public function dispatch($method, $uri)
     {
-        $routes     = $this->getRoutes();
+        $routes     =  $this->app->resolve("route.collection");
         $dispatcher = $this->getDispatcher($routes);
 
         return $this->handleDispatch($dispatcher, $method, $uri);
     }
 
     /**
-     * @return Interfaces\Routes
-     */
-    protected function getRoutes()
-    {
-        return $this->app->resolve("routes");
-    }
-
-    /**
-     * @param Interfaces\Routes $routes
+     * @param Interfaces\Route\Collection $routes
      *
-     * @return Dispatcher
+     * @return FastRouteDispatcher
      */
-    protected function getDispatcher(Interfaces\Routes $routes)
+    protected function getDispatcher(Interfaces\Route\Collection $routes)
     {
         return FastRoute\simpleDispatcher(function (RouteCollector $collector) use ($routes) {
             $routes->applyTo($collector);
@@ -45,30 +39,30 @@ class Router implements Interfaces\Router, Interfaces\ApplicationAware
     }
 
     /**
-     * @param Dispatcher $dispatcher
-     * @param string     $method
-     * @param string     $uri
+     * @param FastRouteDispatcher $dispatcher
+     * @param string              $method
+     * @param string              $uri
      *
      * @return array
      */
-    protected function handleDispatch(Dispatcher $dispatcher, $method, $uri)
+    protected function handleDispatch(FastRouteDispatcher $dispatcher, $method, $uri)
     {
         $info = $dispatcher->dispatch($method, $uri);
 
-        if ($info[0] === Dispatcher::NOT_FOUND) {
+        if ($info[0] === FastRouteDispatcher::NOT_FOUND) {
             return [
                 "status" => 404,
             ];
         }
 
-        if ($info[0] === Dispatcher::METHOD_NOT_ALLOWED) {
+        if ($info[0] === FastRouteDispatcher::METHOD_NOT_ALLOWED) {
             return [
                 "status"  => 405,
                 "methods" => $info[1],
             ];
         }
 
-        if ($info[0] === Dispatcher::FOUND) {
+        if ($info[0] === FastRouteDispatcher::FOUND) {
             return [
                 "status"     => 200,
                 "handler"    => $info[1],

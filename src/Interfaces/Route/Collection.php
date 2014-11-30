@@ -1,10 +1,10 @@
 <?php
 
-namespace Spin\Interfaces;
+namespace Spin\Interfaces\Route;
 
 use FastRoute\RouteCollector;
 
-interface Routes
+interface Collection
 {
     /**
      * @param string $method

@@ -4,6 +4,7 @@ namespace Spin;
 
 use Exception;
 use LogicException;
+use Ratchet;
 use React;
 
 class Application extends Container implements Interfaces\Application
@@ -35,53 +36,16 @@ class Application extends Container implements Interfaces\Application
     {
         $this->bindProviders();
 
-        $this->resolve("events")->emit("app.before");
+        $this->resolve("event.emitter")->emit("app.before");
 
-        $loop   = $this->resolve("loop");
-        $socket = $this->resolve("socket.server");
-        $server = $this->resolve("http.server");
-
-        $router = $this->resolve("router");
-
-        $server->on("request", function ($request, $response) use ($router) {
-            $this->resolve("events")->emit("request.before", $request, $response);
-
-            try {
-                $info = $router->dispatch(
-                    $request->getMethod(),
-                    $request->getPath()
-                );
-
-                if ($info["status"] === 200) {
-                    $this->handleAction($info, $request, $response);
-                }
-
-                if ($info["status"] === 404) {
-                    $this->handleNotFoundError($response);
-                }
-
-                if ($info["status"] === 405) {
-                    $this->handleMethodError($response);
-                }
-            } catch (Exception $exception) {
-                if (getenv("app.debug")) {
-                    throw $exception;
-                }
-
-                $this->handleServerError($response);
-            }
-
-            $this->resolve("events")->emit("request.after", $request, $response);
-        });
-
-        $port = $this->blueprint->getPort();
+        $this->initSocketServer();
+        $this->initHttpServer();
 
         $this->printHeader();
 
-        $socket->listen($port);
-        $loop->run();
+        $this->resolve("loop")->run();
 
-        $this->resolve("events")->emit("app.after");
+        $this->resolve("event.emitter")->emit("app.after");
     }
 
     /**
@@ -110,9 +74,11 @@ class Application extends Container implements Interfaces\Application
     protected function createProviders()
     {
         $providers = [
-            Providers\EventProvider::class,
-            Providers\ReactProvider::class,
-            Providers\RouteProvider::class,
+            Provider\EventProvider::class,
+            Provider\LoopProvider::class,
+            Provider\HttpProvider::class,
+            Provider\RouteProvider::class,
+            Provider\SocketProvider::class,
         ];
 
         $providers = array_merge($providers, $this->blueprint->getProviders());
@@ -126,6 +92,77 @@ class Application extends Container implements Interfaces\Application
 
             $this->providers[$provider] = $instance;
         }
+    }
+
+    /**
+     * @return void
+     */
+    protected function initSocketServer()
+    {
+        $socket = $this->resolve("socket.server");
+
+        $socket->getSocket()->listen(
+            $this->blueprint->getSocketPort(),
+            $this->blueprint->getSocketHost()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    protected function initHttpServer()
+    {
+        $http = $this->resolve("http.server");
+
+        $http->getSocket()->listen(
+            $this->blueprint->getHttpPort(),
+            $this->blueprint->getHttpHost()
+        );
+
+        $http->on("request", function ($request, $response) {
+            $this->handleRequest($this->resolve("route.dispatcher"), $request, $response);
+        });
+    }
+
+    /**
+     * @param Route\Dispatcher    $router
+     * @param React\Http\Request  $request
+     * @param React\Http\Response $response
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
+    protected function handleRequest(Route\Dispatcher $router, React\Http\Request $request, React\Http\Response $response)
+    {
+        $this->resolve("event.emitter")->emit("request.before", $request, $response);
+
+        try {
+            $info = $router->dispatch(
+                $request->getMethod(),
+                $request->getPath()
+            );
+
+            if ($info["status"] === 200) {
+                $this->handleAction($info, $request, $response);
+            }
+
+            if ($info["status"] === 404) {
+                $this->handleNotFoundError($response);
+            }
+
+            if ($info["status"] === 405) {
+                $this->handleMethodError($response);
+            }
+        } catch (Exception $exception) {
+            if (getenv("app.debug")) {
+                throw $exception;
+            }
+
+            $this->handleServerError($response);
+        }
+
+        $this->resolve("event.emitter")->emit("request.after", $request, $response);
     }
 
     /**
@@ -192,9 +229,15 @@ class Application extends Container implements Interfaces\Application
         $response->end("Server error.");
     }
 
+    /**
+     * @return void
+     */
     protected function printHeader()
     {
         // http://patorjk.com/software/taag
+
+        $httpPort   = $this->blueprint->getHttpPort();
+        $socketPort = $this->blueprint->getSocketPort();
 
         print "         _
  ___ ___|_|___
@@ -202,7 +245,8 @@ class Application extends Container implements Interfaces\Application
 |___|  _|_|_|_|
     |_|
 
-Server at http://127.0.0.1:4000
+HTTP at http://127.0.0.1:{$httpPort}
+Sockets at http://127.0.0.1:{$socketPort}
 ";
     }
 }

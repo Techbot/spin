@@ -2,8 +2,9 @@
 
 namespace App;
 
-use App\Providers\EventProvider;
-use App\Providers\RouteProvider;
+use App\Provider\EventProvider;
+use App\Provider\RouteProvider;
+use App\Provider\SocketProvider;
 use Spin\Interfaces;
 
 class Blueprint implements Interfaces\Blueprint
@@ -16,14 +17,39 @@ class Blueprint implements Interfaces\Blueprint
         return [
             EventProvider::class,
             RouteProvider::class,
+            SocketProvider::class,
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getHttpHost()
+    {
+        return "127.0.0.1";
     }
 
     /**
      * @return int
      */
-    public function getPort()
+    public function getHttpPort()
     {
-        return 4000;
+        return 4001;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSocketHost()
+    {
+        return "127.0.0.1";
+    }
+
+    /**
+     * @return int
+     */
+    public function getSocketPort()
+    {
+        return 4002;
     }
 }

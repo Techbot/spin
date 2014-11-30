@@ -1,8 +1,8 @@
 <?php
 
-namespace Spin\Interfaces;
+namespace Spin\Interfaces\Event;
 
-interface Events
+interface Emitter
 {
     /**
      * @param string   $key

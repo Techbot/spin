@@ -1,9 +1,11 @@
 <?php
 
-namespace Spin;
+namespace Spin\Route;
 
 use FastRoute\RouteCollector;
-class Routes implements Interfaces\Routes
+use Spin\Interfaces;
+
+class Collection implements Interfaces\Route\Collection
 {
     /**
      * @var array
