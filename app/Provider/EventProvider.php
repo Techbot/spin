@@ -40,11 +40,11 @@ class EventProvider extends Provider
     {
         $time = null;
 
-        $emitter->listen("request.before", function ($event, $request, $response) use (&$time) {
+        $emitter->listen("http.request.before", function ($event, $request, $response) use (&$time) {
             $time = microtime(true);
         });
 
-        $emitter->listen("request.after", function ($event, $request, $response) use (&$time) {
+        $emitter->listen("http.request.after", function ($event, $request, $response) use (&$time) {
             $path   = $request->getPath();
             $time   = number_format(microtime(true) - $time, 5);
             $memory = memory_get_usage();

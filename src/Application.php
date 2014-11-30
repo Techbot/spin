@@ -39,7 +39,7 @@ class Application extends Container implements Interfaces\Application
         $this->bindProviders();
 
         $emitter = $this->resolve("event.emitter");
-        
+
         $emitter->emit("app.before");
 
         $this->bindSocketServer();
