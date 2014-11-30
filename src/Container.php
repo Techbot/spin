@@ -7,16 +7,6 @@ use Pimple;
 class Container implements Interfaces\Container
 {
     /**
-     * @var array
-     */
-    protected $bound = [];
-
-    /**
-     * @var array
-     */
-    protected $shared = [];
-
-    /**
      * @var Pimple\Container
      */
     protected $provider;

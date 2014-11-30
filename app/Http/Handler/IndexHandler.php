@@ -13,12 +13,12 @@ class IndexHandler
 
     var connection = new WebSocket('ws://127.0.0.1:4002');
 
-    connection.addEventListener('open', function(e) {
+    connection.addEventListener('open', function(event) {
         console.log('Connection established!');
     });
 
-    connection.addEventListener('message', function(e) {
-        console.log(e.data);
+    connection.addEventListener('message', function(event) {
+        console.log(event.data);
     });
 
     console.log('waiting for connection...');
