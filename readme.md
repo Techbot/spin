@@ -13,7 +13,7 @@ This is an experiment. Do not use it in production. Do not expect me to complete
 
 ## Rationale
 
-There are enough MVC frameworks. This is not one of them. There are too few people experimenting with ReactPHP. The purpose of this experiment is to create a familiar file/code structure so that framework folks can be gently introduced to reactive PHP architecture.
+There are too many MVC frameworks. This is not one of them. There are too few people experimenting with ReactPHP. The purpose of this experiment is to create a familiar file/code structure so that framework folks can be gently introduced to reactive PHP architecture.
 
 ## Testing
 
