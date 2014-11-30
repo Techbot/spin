@@ -2,14 +2,13 @@
 
 namespace Spin\Providers;
 
+use Spin\Provider;
 use Spin\Router;
 use Spin\Routes;
 use Spin\Traits;
 
-class RouteProvider
+class RouteProvider extends Provider
 {
-    use Traits\ContainerDependency;
-
     /**
      * @return void
      */
@@ -24,8 +23,11 @@ class RouteProvider
      */
     protected function bindRouter()
     {
-        $this->container->bindShared("router", function () {
-            return new Router;
+        $this->app->bindShared("router", function () {
+            $router = new Router;
+            $router->setApplication($this->app);
+
+            return $router;
         });
     }
 
@@ -34,7 +36,7 @@ class RouteProvider
      */
     protected function bindRoutes()
     {
-        $this->container->bindShared("routes", function () {
+        $this->app->bindShared("routes", function () {
             return new Routes;
         });
     }

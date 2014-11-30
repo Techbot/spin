@@ -3,19 +3,18 @@
 namespace App\Providers;
 
 use App\Controllers\IndexController;
+use Spin\Provider;
 use Spin\Traits;
 
-class RouteProvider
+class RouteProvider extends Provider
 {
-    use Traits\ContainerDependency;
-
     /**
      * @return void
      */
     public function bind()
     {
-        $routes = $this->container->resolve("routes");
+        $routes = $this->app->resolve("routes");
 
-        $routes->add("GET", "/", IndexController::class."@index");
+        $routes->add("GET", "/", IndexController::class . "@index");
     }
 }

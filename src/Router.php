@@ -6,9 +6,9 @@ use FastRoute;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 
-class Router implements Interfaces\Router
+class Router implements Interfaces\Router, Interfaces\ApplicationAware
 {
-    use Traits\ContainerDependency;
+    use Traits\ApplicationAware;
 
     /**
      * @param string $method
@@ -29,7 +29,7 @@ class Router implements Interfaces\Router
      */
     protected function getRoutes()
     {
-        return $this->container->resolve("routes");
+        return $this->app->resolve("routes");
     }
 
     /**

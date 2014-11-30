@@ -18,4 +18,12 @@ class Blueprint implements Interfaces\Blueprint
             RouteProvider::class,
         ];
     }
+
+    /**
+     * @return int
+     */
+    public function getPort()
+    {
+        return 4000;
+    }
 }

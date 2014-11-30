@@ -4,18 +4,17 @@ namespace App\Providers;
 
 use Dotenv;
 use Spin\Interfaces;
+use Spin\Provider;
 use Spin\Traits;
 
-class EventProvider
+class EventProvider extends Provider
 {
-    use Traits\ContainerDependency;
-
     /**
      * @return void
      */
     public function run()
     {
-        $events = $this->container->resolve("events");
+        $events = $this->app->resolve("events");
 
         $this->bindEnvironment($events);
         $this->bindProfiling($events);

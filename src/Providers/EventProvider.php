@@ -2,21 +2,20 @@
 
 namespace Spin\Providers;
 
-use League\Event\PriorityEmitter;
+use League;
 use Spin\Events;
+use Spin\Provider;
 use Spin\Traits;
 
-class EventProvider
+class EventProvider extends Provider
 {
-    use Traits\ContainerDependency;
-
     /**
      * @return void
      */
     public function bind()
     {
-        $this->container->bindShared("events", function () {
-            return new Events(new PriorityEmitter);
+        $this->app->bindShared("events", function () {
+            return new Events(new League\Event\PriorityEmitter);
         });
     }
 }

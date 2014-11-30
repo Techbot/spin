@@ -26,17 +26,7 @@ class Container implements Interfaces\Container
      */
     public function __construct()
     {
-        $this->setProvider();
-    }
-
-    /**
-     * @return $this
-     */
-    protected function setProvider()
-    {
-        $this->provider = new Pimple\Container();
-
-        return $this;
+        $this->provider = new Pimple\Container;
     }
 
     /**
@@ -104,19 +94,5 @@ class Container implements Interfaces\Container
         }
 
         return null;
-    }
-
-    /**
-     * @return static
-     */
-    public static function shared()
-    {
-        static $instance = null;
-
-        if ($instance === null) {
-            $instance = new static();
-        }
-
-        return $instance;
     }
 }

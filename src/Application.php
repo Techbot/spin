@@ -5,12 +5,9 @@ namespace Spin;
 use Exception;
 use LogicException;
 use React;
-use Symfony\Component\Debug\ExceptionHandler;
 
-class Application
+class Application extends Container implements Interfaces\Application
 {
-    use Traits\ContainerDependency;
-
     /**
      * @var array
      */
@@ -23,11 +20,10 @@ class Application
 
     /**
      * @param Interfaces\Blueprint $blueprint
-     * @param Interfaces\Container $container
      */
-    public function __construct(Interfaces\Blueprint $blueprint, Interfaces\Container $container = null)
+    public function __construct(Interfaces\Blueprint $blueprint)
     {
-        $this->setContainerDependency($container);
+        parent::__construct();
 
         $this->blueprint = $blueprint;
     }
@@ -39,18 +35,16 @@ class Application
     {
         $this->bindProviders();
 
-        $this->container->resolve("events")->emit("app.before");
+        $this->resolve("events")->emit("app.before");
 
-        $this->bindErrorHandling();
+        $loop   = $this->resolve("loop");
+        $socket = $this->resolve("socket.server");
+        $server = $this->resolve("http.server");
 
-        $loop   = $this->container->resolve("loop");
-        $socket = $this->container->resolve("socket.server");
-        $server = $this->container->resolve("http.server");
-
-        $router = $this->container->resolve("router");
+        $router = $this->resolve("router");
 
         $server->on("request", function ($request, $response) use ($router) {
-            $this->container->resolve("events")->emit("request.before", $request, $response);
+            $this->resolve("events")->emit("request.before", $request, $response);
 
             try {
                 $info = $router->dispatch(
@@ -77,13 +71,17 @@ class Application
                 $this->handleServerError($response);
             }
 
-            $this->container->resolve("events")->emit("request.after", $request, $response);
+            $this->resolve("events")->emit("request.after", $request, $response);
         });
 
-        $socket->listen(4000);
+        $port = $this->blueprint->getPort();
+
+        $this->printHeader();
+
+        $socket->listen($port);
         $loop->run();
 
-        $this->container->resolve("events")->emit("app.after");
+        $this->resolve("events")->emit("app.after");
     }
 
     /**
@@ -120,21 +118,13 @@ class Application
         $providers = array_merge($providers, $this->blueprint->getProviders());
 
         foreach ($providers as $provider) {
-            $this->providers[$provider] = new $provider;
-        }
-    }
+            $instance = new $provider;
 
-    /**
-     * @return string
-     */
-    protected function bindErrorHandling()
-    {
-        ExceptionHandler::register();
+            if ($instance instanceof Interfaces\ApplicationAware) {
+                $instance->setApplication($this);
+            }
 
-        ini_set("display_errors", 0);
-
-        if (getenv("app.debug")) {
-            ini_set("display_errors", 1);
+            $this->providers[$provider] = $instance;
         }
     }
 
@@ -200,5 +190,17 @@ class Application
 
         $response->writeHead(500, ["content-type" => "text/plain"]);
         $response->end("Server error.");
+    }
+
+    protected function printHeader()
+    {
+        print "         _
+ ___ ___|_|___
+|_ -| . | |   |
+|___|  _|_|_|_|
+    |_|
+
+Server at http://127.0.0.1:4000
+";
     }
 }

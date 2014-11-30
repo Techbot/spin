@@ -93,17 +93,4 @@ class ContainerTest extends TestCase
             $this->assertNull($container->resolve("foo"));
         }
     }
-
-    /**
-     * @test
-     *
-     * @return void
-     */
-    public function itSharesItself()
-    {
-        $first = Container::shared();
-
-        $this->assertInstanceOf(Container::class, $first);
-        $this->assertSame($first, Container::shared());
-    }
 }

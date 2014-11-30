@@ -8,8 +8,6 @@ use Spin\Traits;
 
 class Events implements Interfaces\Events
 {
-    use Traits\ContainerDependency;
-
     /**
      * @var PriorityEmitter
      */

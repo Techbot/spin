@@ -8,8 +8,6 @@ use Spin\Traits;
 
 class Routes implements Interfaces\Routes
 {
-    use Traits\ContainerDependency;
-
     /**
      * @var array
      */
