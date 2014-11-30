@@ -15,7 +15,7 @@ class GithubHandler implements Handler
      */
     public function open(Connection $connection)
     {
-        $connection->send("github handler loaded.");
+        $connection->send("github handler loaded");
     }
 
     /**

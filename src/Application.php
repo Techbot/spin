@@ -6,13 +6,14 @@ use Exception;
 use LogicException;
 use Ratchet;
 use React;
+use SplObjectStorage;
 
 class Application extends Container implements Interfaces\Application
 {
     /**
-     * @var array
+     * @var SplObjectStorage
      */
-    protected $providers = [];
+    protected $providers;
 
     /**
      * @var Interfaces\Blueprint
@@ -26,6 +27,7 @@ class Application extends Container implements Interfaces\Application
     {
         parent::__construct();
 
+        $this->providers = new SplObjectStorage();
         $this->blueprint = $blueprint;
     }
 
@@ -90,7 +92,7 @@ class Application extends Container implements Interfaces\Application
                 $instance->setApplication($this);
             }
 
-            $this->providers[$provider] = $instance;
+            $this->providers->attach($instance);
         }
     }
 

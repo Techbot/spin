@@ -2,10 +2,12 @@
 
 namespace Spin\Interfaces\Http;
 
+use React\Socket\ServerInterface;
+
 interface Server
 {
     /**
-     * @return SocketServerInterface
+     * @return ServerInterface
      */
     public function getSocket();
 }

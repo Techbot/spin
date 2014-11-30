@@ -15,7 +15,7 @@ class TwitterHandler implements Handler
      */
     public function open(Connection $connection)
     {
-        $connection->send("twitter handler loaded.");
+        $connection->send("twitter handler loaded");
     }
 
     /**

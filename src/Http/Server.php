@@ -3,22 +3,22 @@
 namespace Spin\Http;
 
 use React\Http\Server as HttpServer;
-use React\Socket\ServerInterface as SocketServerInterface;
+use React\Socket\ServerInterface;
 use Spin\Interfaces;
 
 class Server extends HttpServer implements Interfaces\Http\Server
 {
     /**
-     * @var SocketServerInterface
+     * @var ServerInterface
      */
     protected $socket;
 
     /**
-     * @param SocketServerInterface $socket
+     * @param ServerInterface $socket
      *
      * @return Server
      */
-    public function __construct(SocketServerInterface $socket)
+    public function __construct(ServerInterface $socket)
     {
         parent::__construct($socket);
 
@@ -26,7 +26,7 @@ class Server extends HttpServer implements Interfaces\Http\Server
     }
 
     /**
-     * @return SocketServerInterface
+     * @return ServerInterface
      */
     public function getSocket()
     {
