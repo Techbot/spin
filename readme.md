@@ -9,4 +9,23 @@ Micro framework built on ReactPHP.
 
 ## Notice
 
-This is an experiment. Do not use it in production. Do not expect it to be maintained or completed.
+This is an experiment. Do not use it in production. Do not expect me to complete or maintain it.
+
+## Rationale
+
+There are enough MVC frameworks. This is not one of them. There are too few people experimenting with ReactPHP. The purpose of this experiment is to create a familiar file/code structure so that framework folks can be gently introduced to reactive PHP architecture.
+
+## Testing
+
+```sh
+$ git@github.com:assertchris/spin.git
+$ cd spin
+$ vendor/bin/phpunit
+```
+
+## Running
+
+```sh
+$ cd spin
+$ php server.php
+```
