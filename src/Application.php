@@ -38,16 +38,18 @@ class Application extends Container implements Interfaces\Application
     {
         $this->bindProviders();
 
-        $this->resolve("event.emitter")->emit("app.before");
+        $emitter = $this->resolve("event.emitter");
+        
+        $emitter->emit("app.before");
 
-        $this->initSocketServer();
-        $this->initHttpServer();
+        $this->bindSocketServer();
+        $this->bindHttpServer();
 
         $this->printHeader();
 
         $this->resolve("loop")->run();
 
-        $this->resolve("event.emitter")->emit("app.after");
+        $emitter->emit("app.after");
     }
 
     /**
@@ -99,21 +101,31 @@ class Application extends Container implements Interfaces\Application
     /**
      * @return void
      */
-    protected function initSocketServer()
+    protected function bindSocketServer()
     {
+        $emitter = $this->resolve("event.emitter");
+
+        $emitter->emit("socket.bind.before");
+
         $socket = $this->resolve("socket.server");
 
         $socket->getSocket()->listen(
             $this->blueprint->getSocketPort(),
             $this->blueprint->getSocketHost()
         );
+
+        $emitter->emit("socket.bind.after");
     }
 
     /**
      * @return void
      */
-    protected function initHttpServer()
+    protected function bindHttpServer()
     {
+        $emitter = $this->resolve("event.emitter");
+
+        $emitter->emit("http.bind.before");
+
         $http = $this->resolve("http.server");
 
         $http->getSocket()->listen(
@@ -121,9 +133,15 @@ class Application extends Container implements Interfaces\Application
             $this->blueprint->getHttpHost()
         );
 
-        $http->on("request", function ($request, $response) {
+        $http->on("request", function ($request, $response) use ($emitter) {
+            $emitter->emit("http.request.before");
+
             $this->handleRequest($this->resolve("route.dispatcher"), $request, $response);
+
+            $emitter->emit("http.request.after");
         });
+
+        $emitter->emit("http.bind.after");
     }
 
     /**
@@ -137,8 +155,6 @@ class Application extends Container implements Interfaces\Application
      */
     protected function handleRequest(Route\Dispatcher $router, React\Http\Request $request, React\Http\Response $response)
     {
-        $this->resolve("event.emitter")->emit("request.before", $request, $response);
-
         try {
             $info = $router->dispatch(
                 $request->getMethod(),
@@ -163,8 +179,6 @@ class Application extends Container implements Interfaces\Application
 
             $this->handleServerError($response);
         }
-
-        $this->resolve("event.emitter")->emit("request.after", $request, $response);
     }
 
     /**
