@@ -6,8 +6,7 @@
         "league/plates": "3.*",
         "nikic/fast-route": "0.*",
         "pimple/pimple": "3.*",
-        "vlucas/phpdotenv": "1.*",
-        "filp/whoops": "1.*"
+        "vlucas/phpdotenv": "1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.*",

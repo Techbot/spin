@@ -1,3 +1,1 @@
-Server error:
-
-<?php echo $this->e($exception); ?>
+<?php echo $this->e($exception);
