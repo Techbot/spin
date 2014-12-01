@@ -7,32 +7,32 @@ use Exception;
 interface Handler
 {
     /**
-     * @param Connection $connection
+     * @param mixed $connection
      *
      * @return void
      */
-    public function open(Connection $connection);
+    public function open($connection);
 
     /**
-     * @param Connection $connection
+     * @param mixed $connection
      *
      * @return void
      */
-    public function close(Connection $connection);
+    public function close($connection);
 
     /**
-     * @param Connection $connection
-     * @param Exception  $exception
+     * @param mixed     $connection
+     * @param Exception $exception
      *
      * @return void
      */
-    public function error(Connection $connection, Exception $exception);
+    public function error($connection, Exception $exception);
 
     /**
-     * @param Connection $connection
-     * @param string     $message
+     * @param mixed  $connection
+     * @param string $message
      *
      * @return void
      */
-    public function message(Connection $connection, $message);
+    public function message($connection, $message);
 }

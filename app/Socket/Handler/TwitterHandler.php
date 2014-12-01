@@ -3,49 +3,48 @@
 namespace App\Socket\Handler;
 
 use Exception;
-use Spin\Interfaces\Socket\Connection;
 use Spin\Interfaces\Socket\Handler;
 
 class TwitterHandler implements Handler
 {
     /**
-     * @param Connection $connection
+     * @param mixed $connection
      *
      * @return void
      */
-    public function open(Connection $connection)
+    public function open($connection)
     {
-        $connection->send("twitter handler loaded");
+        $connection->send("Twitter handler loaded");
     }
 
     /**
-     * @param Connection $connection
+     * @param mixed $connection
      *
      * @return void
      */
-    public function close(Connection $connection)
-    {
-        // TODO
-    }
-
-    /**
-     * @param Connection $connection
-     * @param Exception  $exception
-     *
-     * @return void
-     */
-    public function error(Connection $connection, Exception $exception)
+    public function close($connection)
     {
         // TODO
     }
 
     /**
-     * @param Connection $connection
-     * @param string     $message
+     * @param mixed     $connection
+     * @param Exception $exception
      *
      * @return void
      */
-    public function message(Connection $connection, $message)
+    public function error($connection, Exception $exception)
+    {
+        // TODO
+    }
+
+    /**
+     * @param mixed  $connection
+     * @param string $message
+     *
+     * @return void
+     */
+    public function message($connection, $message)
     {
         // TODO
     }

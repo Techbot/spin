@@ -2,6 +2,8 @@
 
 namespace Spin\Provider;
 
+use Ratchet\Http\HttpServer;
+use Ratchet\WebSocket\WsServer;
 use React\Socket\Server as BaseServer;
 use Spin\Provider;
 use Spin\Socket\Collection;
@@ -51,7 +53,11 @@ class SocketProvider extends Provider
     {
         $this->app->bindShared("socket.server", function () {
             return new Server(
-                $this->app->resolve("socket.collection"),
+                new HttpServer(
+                    new WsServer(
+                        $this->app->resolve("socket.collection")
+                    )
+                ),
                 $this->app->resolve("socket.base.server"),
                 $this->app->resolve("loop")
             );

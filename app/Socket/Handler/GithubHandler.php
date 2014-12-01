@@ -3,49 +3,48 @@
 namespace App\Socket\Handler;
 
 use Exception;
-use Spin\Interfaces\Socket\Connection;
 use Spin\Interfaces\Socket\Handler;
 
 class GithubHandler implements Handler
 {
     /**
-     * @param Connection $connection
+     * @param mixed $connection
      *
      * @return void
      */
-    public function open(Connection $connection)
+    public function open($connection)
     {
-        $connection->send("github handler loaded");
+        $connection->send("Github handler loaded");
     }
 
     /**
-     * @param Connection $connection
+     * @param mixed $connection
      *
      * @return void
      */
-    public function close(Connection $connection)
+    public function close($connection)
     {
         // TODO: Implement close() method.
     }
 
     /**
-     * @param Connection $connection
-     * @param Exception  $exception
+     * @param mixed $connection
+     * @param Exception           $exception
      *
      * @return void
      */
-    public function error(Connection $connection, Exception $exception)
+    public function error($connection, Exception $exception)
     {
         // TODO: Implement error() method.
     }
 
     /**
-     * @param Connection $connection
-     * @param string     $message
+     * @param mixed $connection
+     * @param string              $message
      *
      * @return void
      */
-    public function message(Connection $connection, $message)
+    public function message($connection, $message)
     {
         // TODO: Implement message() method.
     }

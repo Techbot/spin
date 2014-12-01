@@ -255,7 +255,8 @@ class Application extends Container implements Interfaces\Application
         $httpPort   = $this->blueprint->getHttpPort();
         $socketPort = $this->blueprint->getSocketPort();
 
-        print "         _
+        print "
+         _
  ___ ___|_|___
 |_ -| . | |   |
 |___|  _|_|_|_|

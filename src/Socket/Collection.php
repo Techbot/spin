@@ -54,11 +54,12 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\Application
         $emitter = $this->app->resolve("event.emitter");
 
         foreach ($this->handlers as $socket) {
-            $id = $this->handlers[$socket];
+            $id   = $this->handlers[$socket]["id"];
+            $copy = $parameters;
 
-            array_unshift($parameters, "{$key}.{$id}");
+            array_unshift($copy, "{$key}.{$id}");
 
-            call_user_func_array([$emitter, "emit"], $parameters);
+            call_user_func_array([$emitter, "emit"], $copy);
         }
     }
 
@@ -109,24 +110,27 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\Application
 
         $this->handlers->attach($handler);
 
-        $properties       = $this->handlers[$handler];
-        $properties["id"] = $id++;
+        $properties = ["id" => ++$id];
+
+        $this->handlers[$handler] = $properties;
+
+        print PHP_EOL."New socket: ".get_class($handler)." (#".$id.")";
 
         $emitter = $this->app->resolve("event.emitter");
 
-        $emitter->listen("socket.open.{$id}", function ($event, Interfaces\Socket\Connection $connection) use ($handler) {
+        $emitter->listen("socket.open.{$id}", function ($event, $connection) use ($handler) {
             $handler->open($connection);
         });
 
-        $emitter->listen("socket.close.{$id}", function ($event, Interfaces\Socket\Connection $connection) use ($handler) {
+        $emitter->listen("socket.close.{$id}", function ($event, $connection) use ($handler) {
             $handler->close($connection);
         });
 
-        $emitter->listen("socket.error.{$id}", function ($event, Interfaces\Socket\Connection $connection, Exception $exception) use ($handler) {
+        $emitter->listen("socket.error.{$id}", function ($event, $connection, Exception $exception) use ($handler) {
             $handler->error($connection, $exception);
         });
 
-        $emitter->listen("socket.message.{$id}", function ($event, Interfaces\Socket\Connection $connection, $message) use ($handler) {
+        $emitter->listen("socket.message.{$id}", function ($event, $connection, $message) use ($handler) {
             $handler->message($connection, $message);
         });
 
