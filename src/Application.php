@@ -31,6 +31,14 @@ class Application extends Container implements Interfaces\Application
     }
 
     /**
+     * @return Interfaces\Blueprint
+     */
+    public function getBlueprint()
+    {
+        return $this->blueprint;
+    }
+
+    /**
      * @return void
      */
     public function run()
@@ -91,8 +99,6 @@ class Application extends Container implements Interfaces\Application
 
         foreach ($providers as $provider) {
             $instance = new $provider();
-
-            print PHP_EOL."New provider: {$provider}";
 
             if ($instance instanceof Interfaces\ApplicationAware) {
                 $instance->setApplication($this);
@@ -249,13 +255,14 @@ class Application extends Container implements Interfaces\Application
     {
         $template = $this->resolve("template");
 
-        $response->writeHead(500, ["content-type" => "text/html"]);
-
         if (getenv("app.debug")) {
-            $response->end($template->render("error/server/advanced", compact("exception")));
+            $markup = $template->render("error/server/advanced", compact("exception"));
         } else {
-            $response->end($template->render("error/server/basic"));
+            $markup = $template->render("error/server/basic");
         }
+
+        $response->writeHead(500, ["content-type" => "text/html"]);
+        $response->end($markup);
     }
 
     /**
@@ -263,20 +270,13 @@ class Application extends Container implements Interfaces\Application
      */
     protected function printHeader()
     {
-        // http://patorjk.com/software/taag
-
+        $httpHost   = $this->blueprint->getHttphost();
         $httpPort   = $this->blueprint->getHttpPort();
+        $socketHost = $this->blueprint->getSockethost();
         $socketPort = $this->blueprint->getSocketPort();
 
-        print "
-         _
- ___ ___|_|___
-|_ -| . | |   |
-|___|  _|_|_|_|
-    |_|
+        $template = $this->resolve("template");
 
-HTTP at http://127.0.0.1:{$httpPort}
-Sockets at http://127.0.0.1:{$socketPort}
-";
+        print $template->render("console/header", compact("httpHost", "httpPort", "socketHost", "socketPort"));
     }
 }

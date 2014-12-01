@@ -118,8 +118,6 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\Application
 
         $this->handlers[$handler] = $properties;
 
-        print PHP_EOL."New socket: ".get_class($handler)." (#".$id.")";
-
         $emitter = $this->app->resolve("event.emitter");
 
         $emitter->listen("socket.open.{$id}", function ($event, $connection) use ($handler) {
