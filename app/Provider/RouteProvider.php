@@ -14,6 +14,6 @@ class RouteProvider extends Provider
     {
         $collection = $this->app->resolve("route.collection");
 
-        $collection->add("GET", "/", IndexHandler::class . "@index");
+        $collection->add("GET", "/", IndexHandler::class."@index");
     }
 }

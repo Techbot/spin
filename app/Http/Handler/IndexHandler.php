@@ -2,13 +2,15 @@
 
 namespace App\Http\Handler;
 
-class IndexHandler
+use Spin\Http\Handler;
+
+class IndexHandler extends Handler
 {
     /**
      * @return string
      */
     public function index()
     {
-        return file_get_contents("resources/views/index/index.html");
+        return $this->app->resolve("template")->render("index/index");
     }
 }

@@ -110,6 +110,10 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\Application
 
         $this->handlers->attach($handler);
 
+        if ($handler instanceof Interfaces\ApplicationAware) {
+            $handler->setApplication($this->app);
+        }
+
         $properties = ["id" => ++$id];
 
         $this->handlers[$handler] = $properties;

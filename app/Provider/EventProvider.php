@@ -49,7 +49,7 @@ class EventProvider extends Provider
             $time   = number_format(microtime(true) - $time, 5);
             $memory = memory_get_usage();
 
-            print PHP_EOL . "{$path} → {$time} ms + {$memory} bytes";
+            print PHP_EOL."{$path} → {$time} ms + {$memory} bytes";
         });
     }
 }

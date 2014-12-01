@@ -3,9 +3,9 @@
 namespace App\Socket\Handler;
 
 use Exception;
-use Spin\Interfaces\Socket\Handler;
+use Spin\Socket\Handler;
 
-class TwitterHandler implements Handler
+class TwitterHandler extends Handler
 {
     /**
      * @param mixed $connection

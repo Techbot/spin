@@ -2,8 +2,8 @@
 
 namespace Spin\Tests;
 
-use StdClass;
 use Spin\Container;
+use StdClass;
 
 class ContainerTest extends TestCase
 {
@@ -31,7 +31,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container();
 
-        $container->$mode("foo", function() {
+        $container->$mode("foo", function () {
             return new StdClass();
         });
 
@@ -47,7 +47,7 @@ class ContainerTest extends TestCase
     {
         $container = $this->getContainerWithBoundMode("bind");
 
-        $container->extend("foo", function($foo) {
+        $container->extend("foo", function ($foo) {
             $foo->bar = "bar";
 
             return $foo;

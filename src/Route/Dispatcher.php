@@ -20,7 +20,7 @@ class Dispatcher implements Interfaces\Route\Dispatcher, Interfaces\ApplicationA
      */
     public function dispatch($method, $uri)
     {
-        $routes     =  $this->app->resolve("route.collection");
+        $routes     = $this->app->resolve("route.collection");
         $dispatcher = $this->getDispatcher($routes);
 
         return $this->handleDispatch($dispatcher, $method, $uri);
@@ -57,15 +57,15 @@ class Dispatcher implements Interfaces\Route\Dispatcher, Interfaces\ApplicationA
 
         if ($info[0] === FastRouteDispatcher::METHOD_NOT_ALLOWED) {
             return [
-                "status"  => 405,
+                "status" => 405,
                 "methods" => $info[1],
             ];
         }
 
         if ($info[0] === FastRouteDispatcher::FOUND) {
             return [
-                "status"     => 200,
-                "handler"    => $info[1],
+                "status" => 200,
+                "handler" => $info[1],
                 "parameters" => $info[2],
             ];
         }

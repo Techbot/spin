@@ -3,9 +3,9 @@
 namespace App\Socket\Handler;
 
 use Exception;
-use Spin\Interfaces\Socket\Handler;
+use Spin\Socket\Handler;
 
-class GithubHandler implements Handler
+class GithubHandler extends Handler
 {
     /**
      * @param mixed $connection
@@ -28,8 +28,8 @@ class GithubHandler implements Handler
     }
 
     /**
-     * @param mixed $connection
-     * @param Exception           $exception
+     * @param mixed     $connection
+     * @param Exception $exception
      *
      * @return void
      */
@@ -39,8 +39,8 @@ class GithubHandler implements Handler
     }
 
     /**
-     * @param mixed $connection
-     * @param string              $message
+     * @param mixed  $connection
+     * @param string $message
      *
      * @return void
      */

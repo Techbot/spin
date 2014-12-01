@@ -4,7 +4,6 @@ namespace Spin;
 
 use Exception;
 use LogicException;
-use Ratchet;
 use React;
 use SplObjectStorage;
 
@@ -83,12 +82,17 @@ class Application extends Container implements Interfaces\Application
             Provider\HttpProvider::class,
             Provider\RouteProvider::class,
             Provider\SocketProvider::class,
+            Provider\TemplateProvider::class,
         ];
 
-        $providers = array_merge($providers, $this->blueprint->getProviders());
+        foreach ($this->blueprint->getProviders() as $provider) {
+            array_push($providers, $provider);
+        }
 
         foreach ($providers as $provider) {
             $instance = new $provider();
+
+            print PHP_EOL."New provider: {$provider}";
 
             if ($instance instanceof Interfaces\ApplicationAware) {
                 $instance->setApplication($this);
@@ -173,11 +177,7 @@ class Application extends Container implements Interfaces\Application
                 $this->handleMethodError($response);
             }
         } catch (Exception $exception) {
-            if (getenv("app.debug")) {
-                throw $exception;
-            }
-
-            $this->handleServerError($response);
+            $this->handleServerError($response, $exception);
         }
     }
 
@@ -193,8 +193,15 @@ class Application extends Container implements Interfaces\Application
         $handler    = $info["handler"];
         $parameters = $info["parameters"];
 
-        $parts   = explode("@", $handler);
-        $handler = [new $parts[0](), $parts[1]];
+        $parts = explode("@", $handler);
+
+        $instance = new $parts[0]();
+
+        if ($instance instanceof Interfaces\ApplicationAware) {
+            $instance->setApplication($this);
+        }
+
+        $handler = [$instance, $parts[1]];
 
         if (!is_callable($handler)) {
             throw new LogicException("handler invalid");
@@ -213,10 +220,10 @@ class Application extends Container implements Interfaces\Application
      */
     protected function handleNotFoundError(React\Http\Response $response)
     {
-        // TODO
+        $template = $this->resolve("template");
 
-        $response->writeHead(404, ["content-type" => "text/plain"]);
-        $response->end("Not found.");
+        $response->writeHead(404, ["content-type" => "text/html"]);
+        $response->end($template->render("error/missing"));
     }
 
     /**
@@ -226,23 +233,29 @@ class Application extends Container implements Interfaces\Application
      */
     protected function handleMethodError(React\Http\Response $response)
     {
-        // TODO
+        $template = $this->resolve("template");
 
-        $response->writeHead(405, ["content-type" => "text/plain"]);
-        $response->end("Method not allowed.");
+        $response->writeHead(405, ["content-type" => "text/html"]);
+        $response->end($template->render("error/method"));
     }
 
     /**
      * @param React\Http\Response $response
+     * @param Exception           $exception
      *
      * @return void
      */
-    protected function handleServerError(React\Http\Response $response)
+    protected function handleServerError(React\Http\Response $response, Exception $exception)
     {
-        // TODO
+        $template = $this->resolve("template");
 
-        $response->writeHead(500, ["content-type" => "text/plain"]);
-        $response->end("Server error.");
+        $response->writeHead(500, ["content-type" => "text/html"]);
+
+        if (getenv("app.debug")) {
+            $response->end($template->render("error/server/advanced", compact("exception")));
+        } else {
+            $response->end($template->render("error/server/basic"));
+        }
     }
 
     /**

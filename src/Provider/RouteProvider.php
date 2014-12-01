@@ -3,8 +3,8 @@
 namespace Spin\Provider;
 
 use Spin\Provider;
-use Spin\Route\Dispatcher;
 use Spin\Route\Collection;
+use Spin\Route\Dispatcher;
 
 class RouteProvider extends Provider
 {
