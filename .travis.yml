@@ -5,9 +5,10 @@ php:
 before_script:
 - composer install --no-interaction --prefer-dist
 script:
-- vendor/bin/phpunit --coverage-clover=coverage.clover
+- vendor/bin/phpunit --coverage-clover coverage.clover --coverage-html coverage
 - wget https://scrutinizer-ci.com/ocular.phar
 - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+after_success: ./coverage.sh
 branches:
   only:
   - master
