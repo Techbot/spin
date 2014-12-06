@@ -1,14 +1,18 @@
 language: php
+
 php:
 - 5.5
 - 5.6
+
 before_script:
 - composer self-update
 - composer install --no-interaction --prefer-dist
+
 script:
 - vendor/bin/phpunit --coverage-clover coverage.clover --coverage-html coverage
 - wget https://scrutinizer-ci.com/ocular.phar
 - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+
 after_success:
 - git config --global user.email "travis@travis-ci.org"
 - git config --global user.name "Travis"
@@ -22,9 +26,11 @@ after_success:
 - git add -f .
 - git commit -m "Travis build $TRAVIS_BUILD_NUMBER@$TRAVIS_BRANCH pushed to gh-pages"
 - git push -fq origin gh-pages > /dev/null
+
 branches:
   only:
   - master
+
 env:
   global:
   - secure: ebPkHbYy233dQfJhDnzCHIBiqUl5ONrA8f0i2v6sU/kgMM5QhCa/xRDxUlsGYSjp/eyC5epV187gSPS1pjAlLn0gMWtZpMg8G4HrXQh/Q/hBJDfdkpEhqoJHXYvPGv5gntghfXhEWMyECOMcYSLNpL9otRVK5PtZmaNnXPgLhQA=
