@@ -1,1 +1,1 @@
-<?php echo $this->e($exception);
+<?php echo $exception;
