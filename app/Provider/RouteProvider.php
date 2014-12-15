@@ -12,8 +12,8 @@ class RouteProvider extends Provider
      */
     public function bind()
     {
-        $collection = $this->app->resolve("route.collection");
+        $router = $this->container->resolve("router");
 
-        $collection->add("GET", "/", IndexHandler::class."@index");
+        $router->bind("GET", "/", IndexHandler::class."@index");
     }
 }

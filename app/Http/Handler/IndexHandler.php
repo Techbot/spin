@@ -11,6 +11,6 @@ class IndexHandler extends Handler
      */
     public function index()
     {
-        return $this->app->resolve("template")->render("index/index");
+        return $this->container->resolve("template")->render("index/index");
     }
 }

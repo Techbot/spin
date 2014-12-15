@@ -13,7 +13,7 @@ class SocketProvider extends Provider
      */
     public function bind()
     {
-        $collection = $this->app->resolve("socket.collection");
+        $collection = $this->container->resolve("socket.collection");
 
         $collection->add(new GithubHandler());
         $collection->add(new TwitterHandler());

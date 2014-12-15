@@ -5,9 +5,10 @@ namespace Spin;
 use Exception;
 use LogicException;
 use React;
+use Simple;
 use SplObjectStorage;
 
-class Application extends Container implements Interfaces\Application
+class Application extends Container implements Interfaces\Container
 {
     /**
      * @var SplObjectStorage
@@ -100,8 +101,8 @@ class Application extends Container implements Interfaces\Application
         foreach ($providers as $provider) {
             $instance = new $provider();
 
-            if ($instance instanceof Interfaces\ApplicationAware) {
-                $instance->setApplication($this);
+            if ($instance instanceof Interfaces\ContainerAware) {
+                $instance->setContainer($this);
             }
 
             $this->providers->attach($instance);
@@ -146,7 +147,7 @@ class Application extends Container implements Interfaces\Application
         $http->on("request", function ($request, $response) use ($emitter) {
             $emitter->emit("http.request.before", $request, $response);
 
-            $this->handleRequest($this->resolve("route.dispatcher"), $request, $response);
+            $this->handleRequest($request, $response);
 
             $emitter->emit("http.request.after", $request, $response);
         });
@@ -154,57 +155,45 @@ class Application extends Container implements Interfaces\Application
         $emitter->emit("http.bind.after");
     }
 
-    /**
-     * @param Route\Dispatcher    $router
-     * @param React\Http\Request  $request
-     * @param React\Http\Response $response
-     *
-     * @return void
-     *
-     * @throws Exception
-     */
-    protected function handleRequest(Route\Dispatcher $router, React\Http\Request $request, React\Http\Response $response)
+    protected function handleRequest(React\Http\Request $request, React\Http\Response $response)
     {
         try {
-            $info = $router->dispatch(
-                $request->getMethod(),
-                $request->getPath()
-            );
+            $router = $this->resolve("router");
 
-            if ($info["status"] === 200) {
-                $this->handleAction($info, $request, $response);
+            $route = $router->resolve($request->getMethod(), $request->getPath());
+
+            if ($router->status() == 404) {
+                return $this->handleNotFoundError($response);
             }
 
-            if ($info["status"] === 404) {
-                $this->handleNotFoundError($response);
+            if ($router->status() == 405) {
+                return $this->handleMethodError($response);
             }
 
-            if ($info["status"] === 405) {
-                $this->handleMethodError($response);
-            }
+            return $this->handleRoute($route, $request, $response);
         } catch (Exception $exception) {
             $this->handleServerError($response, $exception);
         }
     }
 
     /**
-     * @param array               $info
-     * @param React\Http\Request  $request
-     * @param React\Http\Response $response
+     * @param Simple\Interfaces\Route $route
+     * @param React\Http\Request      $request
+     * @param React\Http\Response     $response
      *
      * @return void
      */
-    protected function handleAction(array $info, React\Http\Request $request, React\Http\Response $response)
+    protected function handleRoute(Simple\Interfaces\Route $route, React\Http\Request $request, React\Http\Response $response)
     {
-        $handler    = $info["handler"];
-        $parameters = $info["parameters"];
+        $handler = $route->data();
+        $parameters = $route->parameters();
 
         $parts = explode("@", $handler);
 
         $instance = new $parts[0]();
 
-        if ($instance instanceof Interfaces\ApplicationAware) {
-            $instance->setApplication($this);
+        if ($instance instanceof Interfaces\ContainerAware) {
+            $instance->setContainer($this);
         }
 
         $handler = [$instance, $parts[1]];
@@ -270,8 +259,8 @@ class Application extends Container implements Interfaces\Application
      */
     protected function printHeader()
     {
-        $httpHost   = $this->blueprint->getHttphost();
-        $httpPort   = $this->blueprint->getHttpPort();
+        $httpHost = $this->blueprint->getHttphost();
+        $httpPort = $this->blueprint->getHttpPort();
         $socketHost = $this->blueprint->getSockethost();
         $socketPort = $this->blueprint->getSocketPort();
 

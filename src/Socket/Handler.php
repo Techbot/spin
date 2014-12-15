@@ -7,5 +7,5 @@ use Spin\Traits;
 
 abstract class Handler implements Interfaces\Socket\Handler
 {
-    use Traits\ApplicationAware;
+    use Traits\ContainerAware;
 }

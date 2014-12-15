@@ -7,5 +7,5 @@ use Spin\Traits;
 
 class Handler implements Interfaces\Http\Handler
 {
-    use Traits\ApplicationAware;
+    use Traits\ContainerAware;
 }

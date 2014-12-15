@@ -2,7 +2,7 @@
 
 namespace Spin;
 
-abstract class Provider implements Interfaces\ApplicationAware
+abstract class Provider implements Interfaces\ContainerAware
 {
-    use Traits\ApplicationAware;
+    use Traits\ContainerAware;
 }

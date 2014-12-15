@@ -8,9 +8,9 @@ use Spin\Interfaces;
 use Spin\Traits;
 use SplObjectStorage;
 
-class Collection implements Interfaces\Socket\Collection, Interfaces\ApplicationAware
+class Collection implements Interfaces\Socket\Collection, Interfaces\ContainerAware
 {
-    use Traits\ApplicationAware;
+    use Traits\ContainerAware;
 
     /**
      * @var SplObjectStorage
@@ -28,7 +28,7 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\Application
     public function __construct()
     {
         $this->connections = new SplObjectStorage();
-        $this->handlers    = new SplObjectStorage();
+        $this->handlers = new SplObjectStorage();
     }
 
     /**
@@ -51,10 +51,10 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\Application
      */
     protected function emit($key, array $parameters = [])
     {
-        $emitter = $this->app->resolve("event.emitter");
+        $emitter = $this->container->resolve("event.emitter");
 
         foreach ($this->handlers as $socket) {
-            $id   = $this->handlers[$socket]["id"];
+            $id = $this->handlers[$socket]["id"];
             $copy = $parameters;
 
             array_unshift($copy, "{$key}.{$id}");
@@ -110,15 +110,15 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\Application
 
         $this->handlers->attach($handler);
 
-        if ($handler instanceof Interfaces\ApplicationAware) {
-            $handler->setApplication($this->app);
+        if ($handler instanceof Interfaces\ContainerAware) {
+            $handler->setContainer($this->container);
         }
 
         $properties = ["id" => ++$id];
 
         $this->handlers[$handler] = $properties;
 
-        $emitter = $this->app->resolve("event.emitter");
+        $emitter = $this->container->resolve("event.emitter");
 
         $emitter->listen("socket.open.{$id}", function ($event, $connection) use ($handler) {
             $handler->open($connection);

@@ -5,7 +5,7 @@ namespace Spin\Interfaces\Socket;
 use Exception;
 use Spin\Interfaces;
 
-interface Handler extends Interfaces\ApplicationAware
+interface Handler extends Interfaces\ContainerAware
 {
     /**
      * @param mixed $connection

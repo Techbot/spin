@@ -26,9 +26,9 @@ class SocketProvider extends Provider
      */
     protected function bindCollection()
     {
-        $this->app->bindShared("socket.collection", function () {
+        $this->container->bindShared("socket.collection", function () {
             $sockets = new Collection();
-            $sockets->setApplication($this->app);
+            $sockets->setContainer($this->container);
 
             return $sockets;
         });
@@ -39,9 +39,9 @@ class SocketProvider extends Provider
      */
     protected function bindBaseServer()
     {
-        $this->app->bind("socket.base.server", function () {
+        $this->container->bind("socket.base.server", function () {
             return new BaseServer(
-                $this->app->resolve("loop")
+                $this->container->resolve("loop")
             );
         });
     }
@@ -51,15 +51,15 @@ class SocketProvider extends Provider
      */
     protected function bindServer()
     {
-        $this->app->bindShared("socket.server", function () {
+        $this->container->bindShared("socket.server", function () {
             return new Server(
                 new HttpServer(
                     new WsServer(
-                        $this->app->resolve("socket.collection")
+                        $this->container->resolve("socket.collection")
                     )
                 ),
-                $this->app->resolve("socket.base.server"),
-                $this->app->resolve("loop")
+                $this->container->resolve("socket.base.server"),
+                $this->container->resolve("loop")
             );
         });
     }

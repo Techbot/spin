@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Provider\EventProvider;
 use App\Provider\RouteProvider;
 use App\Provider\SocketProvider;
 use Spin\Interfaces;
@@ -15,7 +14,6 @@ class Blueprint implements Interfaces\Blueprint
     public function getProviders()
     {
         return [
-            EventProvider::class,
             RouteProvider::class,
             SocketProvider::class,
         ];

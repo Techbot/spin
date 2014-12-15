@@ -2,9 +2,8 @@
 
 namespace Spin\Provider;
 
+use Simple\Router;
 use Spin\Provider;
-use Spin\Route\Collection;
-use Spin\Route\Dispatcher;
 
 class RouteProvider extends Provider
 {
@@ -13,30 +12,8 @@ class RouteProvider extends Provider
      */
     public function bind()
     {
-        $this->bindDispatcher();
-        $this->bindCollection();
-    }
-
-    /**
-     * @return void
-     */
-    protected function bindDispatcher()
-    {
-        $this->app->bindShared("route.dispatcher", function () {
-            $router = new Dispatcher();
-            $router->setApplication($this->app);
-
-            return $router;
-        });
-    }
-
-    /**
-     * @return void
-     */
-    protected function bindCollection()
-    {
-        $this->app->bindShared("route.collection", function () {
-            return new Collection();
+        $this->container->bindShared("router", function () {
+            return new Router();
         });
     }
 }

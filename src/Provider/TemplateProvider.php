@@ -12,7 +12,7 @@ class TemplateProvider extends Provider
      */
     public function bind()
     {
-        $this->app->bindShared("template", function () {
+        $this->container->bindShared("template", function () {
             $templates = $_SERVER["PWD"]."/resources/templates";
 
             if (getenv("app.paths.templates")) {
