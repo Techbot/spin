@@ -11,7 +11,7 @@ class Blueprint implements Interfaces\Blueprint
     /**
      * @return array
      */
-    public function getProviders()
+    public function providers()
     {
         return [
             RouteProvider::class,
@@ -22,7 +22,7 @@ class Blueprint implements Interfaces\Blueprint
     /**
      * @return string
      */
-    public function getHttpHost()
+    public function httpHost()
     {
         return "127.0.0.1";
     }
@@ -30,7 +30,7 @@ class Blueprint implements Interfaces\Blueprint
     /**
      * @return int
      */
-    public function getHttpPort()
+    public function httpPort()
     {
         return 4001;
     }
@@ -38,7 +38,7 @@ class Blueprint implements Interfaces\Blueprint
     /**
      * @return string
      */
-    public function getSocketHost()
+    public function socketHost()
     {
         return "127.0.0.1";
     }
@@ -46,7 +46,7 @@ class Blueprint implements Interfaces\Blueprint
     /**
      * @return int
      */
-    public function getSocketPort()
+    public function socketPort()
     {
         return 4002;
     }

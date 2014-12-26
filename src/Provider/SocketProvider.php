@@ -28,7 +28,7 @@ class SocketProvider extends Provider
     {
         $this->container->bindShared("socket.collection", function () {
             $sockets = new Collection();
-            $sockets->setContainer($this->container);
+            $sockets->container($this->container);
 
             return $sockets;
         });

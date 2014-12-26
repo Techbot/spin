@@ -9,5 +9,5 @@ interface Server
     /**
      * @return ServerInterface
      */
-    public function getSocket();
+    public function socket();
 }

@@ -24,7 +24,7 @@ class GithubHandler extends Handler
      */
     public function close($connection)
     {
-        // TODO: Implement close() method.
+        // TODO
     }
 
     /**
@@ -35,7 +35,7 @@ class GithubHandler extends Handler
      */
     public function error($connection, Exception $exception)
     {
-        // TODO: Implement error() method.
+        // TODO
     }
 
     /**
@@ -46,6 +46,6 @@ class GithubHandler extends Handler
      */
     public function message($connection, $message)
     {
-        // TODO: Implement message() method.
+        // TODO
     }
 }

@@ -11,7 +11,7 @@ class Server extends IoServer implements Interfaces\Socket\Server
     /**
      * @return ServerInterface
      */
-    public function getSocket()
+    public function socket()
     {
         return $this->socket;
     }

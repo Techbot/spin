@@ -7,25 +7,25 @@ interface Blueprint
     /**
      * @return array
      */
-    public function getProviders();
+    public function providers();
 
     /**
      * @return string
      */
-    public function getHttpHost();
+    public function httpHost();
 
     /**
      * @return int
      */
-    public function getHttpPort();
+    public function httpPort();
 
     /**
      * @return string
      */
-    public function getSocketHost();
+    public function socketHost();
 
     /**
      * @return int
      */
-    public function getSocketPort();
+    public function socketPort();
 }

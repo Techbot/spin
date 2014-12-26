@@ -28,7 +28,7 @@ class Server extends HttpServer implements Interfaces\Http\Server
     /**
      * @return ServerInterface
      */
-    public function getSocket()
+    public function socket()
     {
         return $this->socket;
     }

@@ -111,7 +111,7 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\ContainerAw
         $this->handlers->attach($handler);
 
         if ($handler instanceof Interfaces\ContainerAware) {
-            $handler->setContainer($this->container);
+            $handler->container($this->container);
         }
 
         $properties = ["id" => ++$id];

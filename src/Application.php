@@ -94,7 +94,7 @@ class Application extends Container implements Interfaces\Container
             Provider\TemplateProvider::class,
         ];
 
-        foreach ($this->blueprint->getProviders() as $provider) {
+        foreach ($this->blueprint->providers() as $provider) {
             array_push($providers, $provider);
         }
 
@@ -102,7 +102,7 @@ class Application extends Container implements Interfaces\Container
             $instance = new $provider();
 
             if ($instance instanceof Interfaces\ContainerAware) {
-                $instance->setContainer($this);
+                $instance->container($this);
             }
 
             $this->providers->attach($instance);
@@ -120,9 +120,9 @@ class Application extends Container implements Interfaces\Container
 
         $socket = $this->resolve("socket.server");
 
-        $socket->getSocket()->listen(
-            $this->blueprint->getSocketPort(),
-            $this->blueprint->getSocketHost()
+        $socket->socket()->listen(
+            $this->blueprint->socketPort(),
+            $this->blueprint->socketHost()
         );
 
         $emitter->emit("socket.bind.after");
@@ -139,9 +139,9 @@ class Application extends Container implements Interfaces\Container
 
         $http = $this->resolve("http.server");
 
-        $http->getSocket()->listen(
-            $this->blueprint->getHttpPort(),
-            $this->blueprint->getHttpHost()
+        $http->socket()->listen(
+            $this->blueprint->httpPort(),
+            $this->blueprint->httpHost()
         );
 
         $http->on("request", function ($request, $response) use ($emitter) {
@@ -193,7 +193,7 @@ class Application extends Container implements Interfaces\Container
         $instance = new $parts[0]();
 
         if ($instance instanceof Interfaces\ContainerAware) {
-            $instance->setContainer($this);
+            $instance->container($this);
         }
 
         $handler = [$instance, $parts[1]];
@@ -259,10 +259,10 @@ class Application extends Container implements Interfaces\Container
      */
     protected function printHeader()
     {
-        $httpHost = $this->blueprint->getHttphost();
-        $httpPort = $this->blueprint->getHttpPort();
-        $socketHost = $this->blueprint->getSockethost();
-        $socketPort = $this->blueprint->getSocketPort();
+        $httpHost = $this->blueprint->httpHost();
+        $httpPort = $this->blueprint->httpPort();
+        $socketHost = $this->blueprint->socketHost();
+        $socketPort = $this->blueprint->socketPort();
 
         $template = $this->resolve("template");
 
