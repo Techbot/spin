@@ -12,8 +12,11 @@ class LoopProvider extends Provider
      */
     public function bind()
     {
-        $this->container->bindShared("loop", function () {
-            return React\EventLoop\Factory::create();
-        });
+        $this->container->bindShared(
+            "loop",
+            function () {
+                return React\EventLoop\Factory::create();
+            }
+        );
     }
 }

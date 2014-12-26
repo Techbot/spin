@@ -13,8 +13,11 @@ class EventProvider extends Provider
      */
     public function bind()
     {
-        $this->container->bindShared("event.emitter", function () {
-            return new Emitter(new League\Event\PriorityEmitter());
-        });
+        $this->container->bindShared(
+            "event.emitter",
+            function () {
+                return new Emitter(new League\Event\PriorityEmitter());
+            }
+        );
     }
 }

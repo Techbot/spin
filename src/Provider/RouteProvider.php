@@ -12,8 +12,11 @@ class RouteProvider extends Provider
      */
     public function bind()
     {
-        $this->container->bindShared("router", function () {
-            return new Router();
-        });
+        $this->container->bindShared(
+            "router",
+            function () {
+                return new Router();
+            }
+        );
     }
 }

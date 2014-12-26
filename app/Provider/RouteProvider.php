@@ -14,6 +14,6 @@ class RouteProvider extends Provider
     {
         $router = $this->container->resolve("router");
 
-        $router->bind("GET", "/", IndexHandler::class."@index");
+        $router->bind("GET", "/", IndexHandler::class . "@index");
     }
 }

@@ -5,9 +5,9 @@ namespace Spin\Interfaces\Event;
 interface Emitter
 {
     /**
-     * @param string   $key
+     * @param string $key
      * @param callable $callable
-     * @param int      $priority
+     * @param int $priority
      *
      * @return $this
      */

@@ -2,10 +2,8 @@
 
 namespace Spin;
 
-use Exception;
-use LogicException;
 use React;
-use Simple;
+use Spin\Interfaces;
 use SplObjectStorage;
 
 class Application extends Container implements Interfaces\Container
@@ -34,35 +32,25 @@ class Application extends Container implements Interfaces\Container
     /**
      * @return Interfaces\Blueprint
      */
-    public function getBlueprint()
+    public function blueprint()
     {
         return $this->blueprint;
     }
 
-    /**
-     * @return void
-     */
     public function run()
     {
         $this->bindProviders();
 
-        $emitter = $this->resolve("event.emitter");
-
-        $emitter->emit("app.before");
+        $this->resolve("event.emitter")->emit("app.before");
 
         $this->bindSocketServer();
         $this->bindHttpServer();
 
-        $this->printHeader();
-
         $this->resolve("loop")->run();
 
-        $emitter->emit("app.after");
+        $this->resolve("event.emitter")->emit("app.after");
     }
 
-    /**
-     * @return void
-     */
     protected function bindProviders()
     {
         $this->createProviders();
@@ -80,12 +68,10 @@ class Application extends Container implements Interfaces\Container
         }
     }
 
-    /**
-     * @return void
-     */
     protected function createProviders()
     {
         $providers = [
+            Provider\ErrorProvider::class,
             Provider\EventProvider::class,
             Provider\LoopProvider::class,
             Provider\HttpProvider::class,
@@ -109,14 +95,9 @@ class Application extends Container implements Interfaces\Container
         }
     }
 
-    /**
-     * @return void
-     */
     protected function bindSocketServer()
     {
-        $emitter = $this->resolve("event.emitter");
-
-        $emitter->emit("socket.bind.before");
+        $this->resolve("event.emitter")->emit("socket.bind.before");
 
         $socket = $this->resolve("socket.server");
 
@@ -125,17 +106,12 @@ class Application extends Container implements Interfaces\Container
             $this->blueprint->socketHost()
         );
 
-        $emitter->emit("socket.bind.after");
+        $this->resolve("event.emitter")->emit("socket.bind.after");
     }
 
-    /**
-     * @return void
-     */
     protected function bindHttpServer()
     {
-        $emitter = $this->resolve("event.emitter");
-
-        $emitter->emit("http.bind.before");
+        $this->resolve("event.emitter")->emit("http.bind.before");
 
         $http = $this->resolve("http.server");
 
@@ -144,18 +120,25 @@ class Application extends Container implements Interfaces\Container
             $this->blueprint->httpHost()
         );
 
-        $http->on("request", function ($request, $response) use ($emitter) {
-            $emitter->emit("http.request.before", $request, $response);
+        $http->on(
+            "request",
+            function ($request, $response) {
+                $this->resolve("event.emitter")->emit("http.request.before", $request, $response);
 
-            $this->handleRequest($request, $response);
+                $this->handleRequest($request, $response);
 
-            $emitter->emit("http.request.after", $request, $response);
-        });
+                $this->resolve("event.emitter")->emit("http.request.after", $request, $response);
+            }
+        );
 
-        $emitter->emit("http.bind.after");
+        $this->resolve("event.emitter")->emit("http.bind.after");
     }
 
-    protected function handleRequest(React\Http\Request $request, React\Http\Response $response)
+    /**
+     * @param Interfaces\Http\Request  $request
+     * @param Interfaces\Http\Response $response
+     */
+    protected function handleRequest($request, $response)
     {
         try {
             $router = $this->resolve("router");
@@ -163,28 +146,51 @@ class Application extends Container implements Interfaces\Container
             $route = $router->resolve($request->getMethod(), $request->getPath());
 
             if ($router->status() == 404) {
-                return $this->handleNotFoundError($response);
+                $this->handleMissingError($response);
+            } else {
+                if ($router->status() == 405) {
+                    $this->handleMethodError($response);
+                } else {
+                    $this->handleRoute($route, $request, $response);
+                }
             }
-
-            if ($router->status() == 405) {
-                return $this->handleMethodError($response);
-            }
-
-            return $this->handleRoute($route, $request, $response);
         } catch (Exception $exception) {
             $this->handleServerError($response, $exception);
         }
     }
 
     /**
-     * @param Simple\Interfaces\Route $route
-     * @param React\Http\Request      $request
-     * @param React\Http\Response     $response
-     *
-     * @return void
+     * @param Interfaces\Http\Response $response
      */
-    protected function handleRoute(Simple\Interfaces\Route $route, React\Http\Request $request, React\Http\Response $response)
+    protected function handleMissingError($response)
     {
+        $handler = $this->resolve("error.missing");
+        /** @var callable $handler */
+        $handler($response);
+    }
+
+    /**
+     * @param Interfaces\Http\Response $response
+     */
+    protected function handleMethodError($response)
+    {
+        $handler = $this->resolve("error.method");
+        /** @var callable $handler */
+        $handler($response);
+    }
+
+    /**
+     * @param Interfaces\Router\Route  $route
+     * @param Interfaces\Http\Request  $request
+     * @param Interfaces\Http\Response $response
+     *
+     * @throws Exception
+     */
+    protected function handleRoute(
+        $route,
+        $request,
+        $response
+    ) {
         $handler = $route->data();
         $parameters = $route->parameters();
 
@@ -199,7 +205,7 @@ class Application extends Container implements Interfaces\Container
         $handler = [$instance, $parts[1]];
 
         if (!is_callable($handler)) {
-            throw new LogicException("handler invalid");
+            throw new Exception("handler invalid");
         }
 
         $results = call_user_func($handler, $request, $response, $parameters);
@@ -209,63 +215,13 @@ class Application extends Container implements Interfaces\Container
     }
 
     /**
-     * @param React\Http\Response $response
-     *
-     * @return void
+     * @param Interfaces\Http\Response $response
+     * @param Exception                $exception
      */
-    protected function handleNotFoundError(React\Http\Response $response)
+    protected function handleServerError($response, Exception $exception)
     {
-        $template = $this->resolve("template");
-
-        $response->writeHead(404, ["content-type" => "text/html"]);
-        $response->end($template->render("error/missing"));
-    }
-
-    /**
-     * @param React\Http\Response $response
-     *
-     * @return void
-     */
-    protected function handleMethodError(React\Http\Response $response)
-    {
-        $template = $this->resolve("template");
-
-        $response->writeHead(405, ["content-type" => "text/html"]);
-        $response->end($template->render("error/method"));
-    }
-
-    /**
-     * @param React\Http\Response $response
-     * @param Exception           $exception
-     *
-     * @return void
-     */
-    protected function handleServerError(React\Http\Response $response, Exception $exception)
-    {
-        $template = $this->resolve("template");
-
-        if (getenv("app.debug")) {
-            $markup = $template->render("error/server/advanced", compact("exception"));
-        } else {
-            $markup = $template->render("error/server/basic");
-        }
-
-        $response->writeHead(500, ["content-type" => "text/html"]);
-        $response->end($markup);
-    }
-
-    /**
-     * @return void
-     */
-    protected function printHeader()
-    {
-        $httpHost = $this->blueprint->httpHost();
-        $httpPort = $this->blueprint->httpPort();
-        $socketHost = $this->blueprint->socketHost();
-        $socketPort = $this->blueprint->socketPort();
-
-        $template = $this->resolve("template");
-
-        print $template->render("console/header", compact("httpHost", "httpPort", "socketHost", "socketPort"));
+        $handler = $this->resolve("error.server");
+        /** @var callable $handler */
+        $handler($response, $exception);
     }
 }

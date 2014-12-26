@@ -26,12 +26,15 @@ class SocketProvider extends Provider
      */
     protected function bindCollection()
     {
-        $this->container->bindShared("socket.collection", function () {
-            $sockets = new Collection();
-            $sockets->container($this->container);
+        $this->container->bindShared(
+            "socket.collection",
+            function () {
+                $sockets = new Collection();
+                $sockets->container($this->container);
 
-            return $sockets;
-        });
+                return $sockets;
+            }
+        );
     }
 
     /**
@@ -39,11 +42,14 @@ class SocketProvider extends Provider
      */
     protected function bindBaseServer()
     {
-        $this->container->bind("socket.base.server", function () {
-            return new BaseServer(
-                $this->container->resolve("loop")
-            );
-        });
+        $this->container->bind(
+            "socket.base.server",
+            function () {
+                return new BaseServer(
+                    $this->container->resolve("loop")
+                );
+            }
+        );
     }
 
     /**
@@ -51,16 +57,19 @@ class SocketProvider extends Provider
      */
     protected function bindServer()
     {
-        $this->container->bindShared("socket.server", function () {
-            return new Server(
-                new HttpServer(
-                    new WsServer(
-                        $this->container->resolve("socket.collection")
-                    )
-                ),
-                $this->container->resolve("socket.base.server"),
-                $this->container->resolve("loop")
-            );
-        });
+        $this->container->bindShared(
+            "socket.server",
+            function () {
+                return new Server(
+                    new HttpServer(
+                        new WsServer(
+                            $this->container->resolve("socket.collection")
+                        )
+                    ),
+                    $this->container->resolve("socket.base.server"),
+                    $this->container->resolve("loop")
+                );
+            }
+        );
     }
 }

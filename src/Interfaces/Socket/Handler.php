@@ -22,7 +22,7 @@ interface Handler extends Interfaces\ContainerAware
     public function close($connection);
 
     /**
-     * @param mixed     $connection
+     * @param mixed $connection
      * @param Exception $exception
      *
      * @return void
@@ -30,7 +30,7 @@ interface Handler extends Interfaces\ContainerAware
     public function error($connection, Exception $exception);
 
     /**
-     * @param mixed  $connection
+     * @param mixed $connection
      * @param string $message
      *
      * @return void

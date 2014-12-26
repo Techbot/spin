@@ -12,10 +12,13 @@ class HttpProvider extends Provider
      */
     public function bind()
     {
-        $this->container->bindShared("http.server", function () {
-            return new Server(
-                $this->container->resolve("socket.base.server")
-            );
-        });
+        $this->container->bindShared(
+            "http.server",
+            function () {
+                return new Server(
+                    $this->container->resolve("socket.base.server")
+                );
+            }
+        );
     }
 }

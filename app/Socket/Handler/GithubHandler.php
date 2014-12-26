@@ -28,7 +28,7 @@ class GithubHandler extends Handler
     }
 
     /**
-     * @param mixed     $connection
+     * @param mixed $connection
      * @param Exception $exception
      *
      * @return void
@@ -39,7 +39,7 @@ class GithubHandler extends Handler
     }
 
     /**
-     * @param mixed  $connection
+     * @param mixed $connection
      * @param string $message
      *
      * @return void
