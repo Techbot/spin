@@ -14,6 +14,10 @@ class Response extends BaseResponse implements Interfaces\Http\Response
      */
     public function headers($status, array $headers = null)
     {
+        if ($headers === null) {
+            $headers = [];
+        }
+
         $this->writeHead($status, $headers);
     }
 

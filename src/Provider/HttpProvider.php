@@ -14,7 +14,7 @@ class HttpProvider extends Provider
     {
         $this->container->bindShared(
             "http.server",
-            function () {
+            function () use ($resolve) {
                 return new Server(
                     $resolve("socket.base.server")
                 );

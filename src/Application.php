@@ -2,6 +2,7 @@
 
 namespace Spin;
 
+use Exception;
 use React;
 use Spin\Interfaces;
 use SplObjectStorage;
