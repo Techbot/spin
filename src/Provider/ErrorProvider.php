@@ -8,9 +8,12 @@ use Spin\Provider;
 
 class ErrorProvider extends Provider
 {
-    public function bind()
+    /**
+     * @param callable $resolve
+     */
+    public function bind(callable $resolve)
     {
-        $template = $this->container->resolve("template");
+        $template = $resolve("template");
 
         $this->bindMissingHandler($template);
         $this->bindMethodError($template);
@@ -26,8 +29,8 @@ class ErrorProvider extends Provider
             "error.missing",
             function () use ($template) {
                 return function (Response $response) use ($template) {
-                    $response->writeHead(404, ["content-type" => "text/html"]);
-                    $response->end($template->render("error/missing"));
+                    $response->headers(404, ["content-type" => "text/html"]);
+                    $response->render($template->render("error/missing"));
                 };
             }
         );
@@ -42,8 +45,8 @@ class ErrorProvider extends Provider
             "error.method",
             function () use ($template) {
                 return function (Response $response) use ($template) {
-                    $response->writeHead(405, ["content-type" => "text/html"]);
-                    $response->end($template->render("error/method"));
+                    $response->headers(405, ["content-type" => "text/html"]);
+                    $response->render($template->render("error/method"));
                 };
             }
         );
@@ -58,14 +61,14 @@ class ErrorProvider extends Provider
             "error.server",
             function () use ($template) {
                 return function (Response $response, Exception $exception) use ($template) {
-                    $response->writeHead(500, ["content-type" => "text/html"]);
+                    $response->headers(500, ["content-type" => "text/html"]);
 
                     if (getenv("application.debug")) {
-                        $response->end(
+                        $response->render(
                             $template->render("error/server/advanced", ["exception" => $exception])
                         );
                     } else {
-                        $response->end(
+                        $response->render(
                             $markup = $template->render("error/server/basic")
                         );
                     }

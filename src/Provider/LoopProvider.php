@@ -8,9 +8,9 @@ use Spin\Provider;
 class LoopProvider extends Provider
 {
     /**
-     * @return void
+     * @param callable $resolve
      */
-    public function bind()
+    public function bind(callable $resolve)
     {
         $this->container->bindShared(
             "loop",

@@ -9,11 +9,11 @@ use Spin\Provider;
 class SocketProvider extends Provider
 {
     /**
-     * @return void
+     * @param callable $resolve
      */
-    public function bind()
+    public function bind(callable $resolve)
     {
-        $collection = $this->container->resolve("socket.collection");
+        $collection = $resolve("socket.collection");
 
         $collection->add(new GithubHandler());
         $collection->add(new TwitterHandler());

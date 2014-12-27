@@ -9,9 +9,9 @@ use Spin\Provider;
 class EventProvider extends Provider
 {
     /**
-     * @return void
+     * @param callable $resolve
      */
-    public function bind()
+    public function bind(callable $resolve)
     {
         $this->container->bindShared(
             "event.emitter",

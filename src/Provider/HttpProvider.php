@@ -8,15 +8,15 @@ use Spin\Provider;
 class HttpProvider extends Provider
 {
     /**
-     * @return void
+     * @param callable $resolve
      */
-    public function bind()
+    public function bind(callable $resolve)
     {
         $this->container->bindShared(
             "http.server",
             function () {
                 return new Server(
-                    $this->container->resolve("socket.base.server")
+                    $resolve("socket.base.server")
                 );
             }
         );

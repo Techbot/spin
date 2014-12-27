@@ -8,13 +8,13 @@ use Spin\Provider;
 class TemplateProvider extends Provider
 {
     /**
-     * @return void
+     * @param callable $resolve
      */
-    public function bind()
+    public function bind(callable $resolve)
     {
         $this->container->bindShared(
             "template",
-            function () {
+            function () use ($resolve) {
                 $templates = $_SERVER["PWD"] . "/resources/templates";
 
                 if (getenv("app.paths.templates")) {

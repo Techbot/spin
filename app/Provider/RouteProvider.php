@@ -8,11 +8,11 @@ use Spin\Provider;
 class RouteProvider extends Provider
 {
     /**
-     * @return void
+     * @param callable $resolve
      */
-    public function bind()
+    public function bind(callable $resolve)
     {
-        $router = $this->container->resolve("router");
+        $router = $resolve("router");
 
         $router->bind("GET", "/", IndexHandler::class . "@index");
     }

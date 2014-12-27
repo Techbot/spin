@@ -33,8 +33,6 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\ContainerAw
 
     /**
      * @param ConnectionInterface $connection
-     *
-     * @return void
      */
     public function onOpen(ConnectionInterface $connection)
     {
@@ -45,9 +43,7 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\ContainerAw
 
     /**
      * @param string $key
-     * @param array $parameters
-     *
-     * @return void
+     * @param array  $parameters
      */
     protected function emit($key, array $parameters = [])
     {
@@ -65,8 +61,6 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\ContainerAw
 
     /**
      * @param ConnectionInterface $connection
-     *
-     * @return void
      */
     public function onClose(ConnectionInterface $connection)
     {
@@ -77,9 +71,7 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\ContainerAw
 
     /**
      * @param ConnectionInterface $connection
-     * @param Exception $exception
-     *
-     * @return void
+     * @param Exception           $exception
      */
     public function onError(ConnectionInterface $connection, Exception $exception)
     {
@@ -90,9 +82,7 @@ class Collection implements Interfaces\Socket\Collection, Interfaces\ContainerAw
 
     /**
      * @param ConnectionInterface $connection
-     * @param string $message
-     *
-     * @return void
+     * @param string              $message
      */
     public function onMessage(ConnectionInterface $connection, $message)
     {

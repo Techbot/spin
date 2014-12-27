@@ -55,15 +55,19 @@ class Application extends Container implements Interfaces\Container
     {
         $this->createProviders();
 
+        $resolve = function($key) {
+            return $this->resolve($key);
+        };
+
         foreach ($this->providers as $instance) {
             if (method_exists($instance, "bind")) {
-                $instance->bind();
+                $instance->bind($resolve);
             }
         }
 
         foreach ($this->providers as $instance) {
             if (method_exists($instance, "run")) {
-                $instance->run();
+                $instance->run($resolve);
             }
         }
     }
